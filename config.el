@@ -18,8 +18,8 @@
 
 
 ;; Setup some readline keys etc
-(map! :ie "C-h" #'delete-backward-char
-      :ie "C-d" #'delete-forward-char
+(map! :ige "C-h" #'delete-backward-char
+      :ige "C-d" #'delete-forward-char
       "C-S-h" #'help-command
       "M-u" #'universal-argument)
 
