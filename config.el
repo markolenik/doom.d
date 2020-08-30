@@ -7,6 +7,7 @@
 
 ;; (setq doom-theme 'doom-molokai)
 
+
 ;; Set font
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5))
 
@@ -64,21 +65,18 @@
   :init
   (setq helm-move-to-line-cycle-in-source t)
   :config
-  (map!
-   "<f13>" #'helm-mini
-   "<f14>" #'helm-find-files
-   "C-<f14>" #'helm-recentf
-   "M-y" #'helm-show-kill-ring
-   "M-m" #'helm-imenu
-   (:leader
-    :n "ss" #'helm-occur)
-   (:map helm-map
-    "C-h" #'delete-backward-char
-    "M-O" #'helm-ff-run-open-file-with-default-tool
-    "M-j" #'helm-next-source
-    "M-k" #'helm-previous-source)
-   (:map helm-find-files-map
-    "C-l" #'helm-execute-persistent-action)))
+  (map! "<f13>" #'helm-mini
+        "M-y" #'helm-show-kill-ring
+        "M-m" #'helm-imenu
+        (:leader
+         :n "ss" #'helm-occur)
+        (:map helm-map
+         "C-h" #'delete-backward-char
+         "M-O" #'helm-ff-run-open-file-with-default-tool
+         "M-j" #'helm-next-source
+         "M-k" #'helm-previous-source)
+        (:map helm-find-files-map
+         "C-l" #'helm-execute-persistent-action)))
 
 
 ;; Sane company defaults
@@ -123,7 +121,6 @@
   (remove-hook! 'text-mode-hook #'(hl-line-mode display-line-numbers-mode)))
 
 
-
 ;; Tranpose window frames
 (use-package! transpose-frame
   :config
@@ -144,18 +141,32 @@
         "<f15>" #'deft-find-file))
 
 
-;; org-mode
 (use-package! org
   ;; `org-num-mode' shows nubmered headings
-  :hook (org-mode . org-num-mode)
+  ;; :hook (org-mode . org-num-mode)
   :init
   (setq org-directory "~/notes/"
         org-log-done 'time
         org-log-into-drawer t))
 
-;; (use-package! org-journal
-;;   )
-;;
+(use-package! org-journal
+  :init
+  (setq org-journal-file-header "#+TITLE: %d %B %Y\n\n"
+        org-journal-file-type 'weekly
+        org-journal-date-format "%A, %d %B %Y"
+        org-journal-file-format "%Y-%m-%d.org"
+        org-journal-enable-agenda-integration t)
+  :config
+  (map! :map calendar-mode-map :leader
+        :n "j m" 'org-journal-mark-entries
+        :n "j r" 'org-journal-read-entry
+        :n "j d" 'org-journal-display-entry
+        :n "] j" 'org-journal-next-entry
+        :n "[ j" 'org-journal-previous-entry
+        :n "j n" 'org-journal-new-date-entry
+        :n "j s w" 'org-journal-search-calendar-week
+        :n "j s m" 'org-journal-search-calendar-month
+        :n "j s y" 'org-journal-search-calendar-year))
 
 
 (use-package! evil-org
@@ -171,7 +182,8 @@
   :init
   (setq org-roam-directory "~/notes"
         org-roam-tag-sources '(prop last-directory)
-        org-id-link-to-org-use-id t)
+        org-id-link-to-org-use-id t
+        +org-roam-open-buffer-on-find-file nil)
   ;; Set up templates
   (setq org-roam-capture-templates
         '(("d" "default" plain (function org-roam-capture--get-point)
@@ -202,12 +214,57 @@
         org-roam-capture-ref-templates
         '(("r" "ref" plain (function org-roam-capture--get-point)
            "%?"
-           :file-name "website/${slug}"
+           :file-name "web/${slug}"
            :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n
  - source :: ${ref}\n\n"
            :unnarrowed t)))
   :config
-  ;; TODO There should be no need to do this. What goes wrong in doom?
-  (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev))
-  ;; (map! )
+  (map!
+   (:map org-roam-backlinks-mode-map
+    :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)
+   (:prefix ("<f14>" . "roam")
+    :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
+    :desc "Org Roam Capture"              "c" #'org-roam-capture
+    :desc "Find file"                     "f" #'org-roam-find-file
+    :desc "Show graph"                    "g" #'org-roam-graph
+    :desc "Insert"                        "i" #'org-roam-insert
+    :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
+    :desc "Org Roam"                      "r" #'org-roam))
   )
+
+
+(use-package! helm-bibtex
+  :after helm
+  :defer t
+  :init
+  (setq bibtex-completion-bibliography "~/bib/bibliography.bib"
+        bibtex-completion-library-path "~/bib"
+        bibtex-completion-pdf-field nil
+        bibtex-completion-find-additional-pdfs t
+        helm-bibtex-full-frame t
+        bibtex-completion-pdf-open-function
+        (lambda (fpath)
+          (call-process "xdg-open" nil 0 nil fpath))))
+
+
+(use-package! latex
+  :init
+  (setq +latex-viewers '(evince)
+        TeX-save-query nil             ; Don't ask to save before compile.
+        TeX-command-default "LatexMk"
+        TeX-engine 'luatex)
+  ;; Sane paragraph definition
+  (setq-hook! 'LaTeX-mode-hook
+    paragraph-start "\f\\|[ 	]*$"
+    paragraph-separate "[ 	\f]*$"))
+
+
+;; NOTE Not using it, due to interferences with TAB funtionality. Easier to call `org-roam-insert-immediate'.
+;; ;; BUG
+;; ;; You shouldn't have to change company-backends manually. There's something wrong
+;; ;; in `modules/lang/org/config.el'. I think they overwrite the backend.
+;; (use-package! company-org-roam
+;;   :when (featurep! :completion company)
+;;   :after org-roam
+;;   :config
+;;   (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
