@@ -259,6 +259,27 @@
     paragraph-separate "[ 	\f]*$"))
 
 
+(use-package! python
+  :init
+  (setq jupyter-repl-echo-eval-p nil
+        jupyter-eval-use-overlays t)
+  :preface
+  (defun mark/jupyter-connect-repl ()
+    "Connect to Jupyter Kernel with kernel file suggestion and without
+opening REPL buffer."
+    (interactive)
+    (let* ((path (shell-command-to-string "jupyter --runtime-dir"))
+           (file-name (nth 0 (split-string path))))
+      (jupyter-connect-repl (read-file-name "Connection file: "
+                                            (concat file-name "/"))
+      nil t nil nil)))
+  )
+
+
+
+
+
+
 ;; NOTE Not using it, due to interferences with TAB funtionality. Easier to call `org-roam-insert-immediate'.
 ;; ;; BUG
 ;; ;; You shouldn't have to change company-backends manually. There's something wrong

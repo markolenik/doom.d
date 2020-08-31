@@ -21,3 +21,6 @@
 ;; Use latest version of `helm-bibtex' instead.
 (when (featurep! :completion helm)
   (package! helm-bibtex :pin nil))
+
+
+(package! jupyter)
