@@ -84,6 +84,8 @@
          "M-j" #'helm-next-source
          "M-k" #'helm-previous-source)
         (:map helm-find-files-map
+         "C-l" #'helm-execute-persistent-action)
+        (:map helm-read-file-map
          "C-l" #'helm-execute-persistent-action)))
 
 
