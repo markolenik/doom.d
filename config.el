@@ -64,6 +64,11 @@
         :n "ga" #'evil-switch-to-windows-last-buffer))
 
 
+(use-package! evil-snipe
+  :init
+  (setq evil-snipe-spillover-scope 'visible))
+
+
 (use-package! helm
   :init
   (setq helm-move-to-line-cycle-in-source t)
