@@ -199,7 +199,6 @@
   :init
   (setq org-roam-directory "~/notes"
         org-roam-tag-sources '(prop last-directory)
-        org-id-link-to-org-use-id t
         +org-roam-open-buffer-on-find-file nil)
   ;; Set up templates
   (setq org-roam-capture-templates
@@ -240,14 +239,14 @@
    (:map org-roam-backlinks-mode-map
     :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)
    (:prefix ("<f14>" . "roam")
-    :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
+    :desc "Switch to roam buffer"         "b" #'org-roam-switch-to-buffer
     :desc "Org Roam Capture"              "c" #'org-roam-capture
     :desc "Find file"                     "f" #'org-roam-find-file
     :desc "Show graph"                    "g" #'org-roam-graph
     :desc "Insert"                        "i" #'org-roam-insert
     :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
-    :desc "Org Roam"                      "r" #'org-roam))
-  )
+    :desc "Org Roam"                      "r" #'org-roam)
+   (:desc "Switch to roam buffer" :g "C-<f13>" #'org-roam-switch-to-buffer)))
 
 
 (use-package! helm-bibtex
