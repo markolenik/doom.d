@@ -5,7 +5,10 @@
 (setq user-full-name "Mark Olenik"
       user-mail-address "mark.olenik@gmail.com")
 
-;; (setq doom-theme 'doom-molokai)
+(setq doom-theme 'doom-vibrant)
+(custom-set-faces!
+  `(show-paren-match :foreground ,(doom-color 'bg)
+                     :background ,(doom-color 'magenta) :weight ultra-bold))
 
 
 ;; Set font
@@ -272,11 +275,12 @@ opening REPL buffer."
            (file-name (nth 0 (split-string path))))
       (jupyter-connect-repl (read-file-name "Connection file: "
                                             (concat file-name "/"))
-      nil t nil nil)))
-  )
+      nil t nil nil))))
 
 
-
+;; (after! elisp-mode
+;;   ;; `rainbow-delimiters' doesn't work well with `highlight-parentheses'.
+;;   (remove-hook! 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
 
 
 
