@@ -157,7 +157,14 @@
   :init
   (setq org-directory "~/notes/"
         org-log-done 'time
-        org-log-into-drawer t))
+        org-log-into-drawer t
+        org-id-link-to-org-use-id t
+        ;; Setting this to `t' is necessary in order to be able to link to
+        ;; IDs across different files. If `t', Emacs creates a file, .orgids
+        ;; in my case, with lists all the files and their respective heading
+        ;; IDs. If no such file is found, Emacs will go through all files
+        ;; and try to generate it, which might take time.
+        org-id-track-globally t))
 
 (use-package! org-journal
   :init
