@@ -8,7 +8,7 @@
 (setq doom-theme 'doom-vibrant)
 (custom-set-faces!
   `(show-paren-match :foreground ,(doom-color 'bg)
-                     :background ,(doom-color 'magenta) :weight ultra-bold))
+                     :background ,(doom-color 'magenta) :weight bold))
 
 
 ;; Set font
@@ -277,10 +277,6 @@ opening REPL buffer."
                                             (concat file-name "/"))
       nil t nil nil))))
 
-
-;; (after! elisp-mode
-;;   ;; `rainbow-delimiters' doesn't work well with `highlight-parentheses'.
-;;   (remove-hook! 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
 
 
 
