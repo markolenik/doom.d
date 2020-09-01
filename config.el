@@ -78,7 +78,8 @@
         "M-y" #'helm-show-kill-ring
         "M-m" #'helm-imenu
         (:leader
-         :n "ss" #'helm-occur)
+         :n "ss" #'helm-occur
+         :n "C-." #'helm-recentf)
         (:map helm-map
          "C-h" #'delete-backward-char
          "M-O" #'helm-ff-run-open-file-with-default-tool
@@ -297,8 +298,6 @@ opening REPL buffer."
       (jupyter-connect-repl (read-file-name "Connection file: "
                                             (concat file-name "/"))
       nil t nil nil))))
-
-
 
 
 ;; NOTE Not using it, due to interferences with TAB funtionality. Easier to call `org-roam-insert-immediate'.
