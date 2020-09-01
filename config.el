@@ -61,7 +61,8 @@
   :config
   (map! "M-o" #'+evil/insert-newline-below
         "M-O" #'+evil/insert-newline-above
-        :n "ga" #'evil-switch-to-windows-last-buffer))
+        :n "ga" #'evil-switch-to-windows-last-buffer
+        :n "0" #'doom/backward-to-bol-or-indent))
 
 
 (use-package! evil-snipe
