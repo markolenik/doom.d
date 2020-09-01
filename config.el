@@ -257,6 +257,14 @@
            :unnarrowed t)))
   :config
   (map!
+   (:leader :prefix ("r" . "roam")
+    :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
+    :desc "Org Roam Capture"              "c" #'org-roam-capture
+    :desc "Find file"                     "f" #'org-roam-find-file
+    :desc "Show graph"                    "g" #'org-roam-graph
+    :desc "Insert"                        "i" #'org-roam-insert
+    :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
+    :desc "Org Roam"                      "r" #'org-roam)
    (:map org-roam-backlinks-mode-map
     :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)
    (:desc "Switch to roam buffer" :g "C-<f13>" #'org-roam-switch-to-buffer
