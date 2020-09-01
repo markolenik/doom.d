@@ -89,6 +89,26 @@
          "C-l" #'helm-execute-persistent-action)))
 
 
+(use-package! helm-bibtex
+  :after helm
+  :defer t
+  :init
+  (setq helm-bibtex-full-frame t
+        bibtex-completion-bibliography "~/bib/bibliography.bib"
+        bibtex-completion-library-path "~/bib"
+        bibtex-completion-notes-path "~/notes/bib"
+        bibtex-completion-pdf-field nil
+        bibtex-completion-find-additional-pdfs t
+        bibtex-completion-pdf-open-function
+        (lambda (fpath)
+          (call-process "xdg-open" nil 0 nil fpath))
+        bibtex-completion-notes-template-multiple-files
+        (concat
+         "#+TITLE: ${title}\n"
+         "#+ROAM_ALIAS: ${=key=}\n"
+         "#+ROAM_KEY: cite:${=key=}\n\n")))
+
+
 ;; Sane company defaults
 (use-package! company
   :config
@@ -238,29 +258,8 @@
   (map!
    (:map org-roam-backlinks-mode-map
     :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)
-   (:prefix ("<f14>" . "roam")
-    :desc "Switch to roam buffer"         "b" #'org-roam-switch-to-buffer
-    :desc "Org Roam Capture"              "c" #'org-roam-capture
-    :desc "Find file"                     "f" #'org-roam-find-file
-    :desc "Show graph"                    "g" #'org-roam-graph
-    :desc "Insert"                        "i" #'org-roam-insert
-    :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
-    :desc "Org Roam"                      "r" #'org-roam)
-   (:desc "Switch to roam buffer" :g "C-<f13>" #'org-roam-switch-to-buffer)))
-
-
-(use-package! helm-bibtex
-  :after helm
-  :defer t
-  :init
-  (setq bibtex-completion-bibliography "~/bib/bibliography.bib"
-        bibtex-completion-library-path "~/bib"
-        bibtex-completion-pdf-field nil
-        bibtex-completion-find-additional-pdfs t
-        helm-bibtex-full-frame t
-        bibtex-completion-pdf-open-function
-        (lambda (fpath)
-          (call-process "xdg-open" nil 0 nil fpath))))
+   (:desc "Switch to roam buffer" :g "C-<f13>" #'org-roam-switch-to-buffer
+    :desc "Roam find file"        :g "<f14>" #'org-roam-find-file)))
 
 
 (use-package! latex
