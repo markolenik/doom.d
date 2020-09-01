@@ -107,18 +107,19 @@
         bibtex-completion-notes-template-multiple-files
         (concat
          "#+TITLE: ${title}\n"
-         "#+ROAM_ALIAS: ${=key=}\n"
+         "#+ROAM_ALIAS: \"${=key=}\"\n"
          "#+ROAM_KEY: cite:${=key=}\n\n")))
 
 
 ;; Sane company defaults
 (use-package! company
   :config
+  (set-company-backend! '(text-mode prog-mode)
+    'company-files)
   (map!
    (:map company-active-map
     "C-h" #'delete-backward-char
     "C-S-h" #'company-show-doc-buffer)))
-
 
 
 ;; I prefer this over `evil-nerd-commenter'
@@ -282,6 +283,28 @@
   (setq-hook! 'LaTeX-mode-hook
     paragraph-start "\f\\|[ 	]*$"
     paragraph-separate "[ 	\f]*$"))
+
+
+(use-package! bibtex
+  :init
+  (setq bibtex-maintain-sorted-entries t
+        bibtex-align-at-equal-sign t
+        bibtex-autokey-year-length 4
+        bibtex-autokey-name-year-separator ""
+        bibtex-autokey-year-title-separator "-"
+        bibtex-autokey-titleword-separator ""
+        bibtex-autokey-titlewords 0
+        bibtex-autokey-titlewords-stretch 0)
+  :config
+  ;; Set type of formatting performed by `bibtex-clean-entry'
+  ;; (add-to-list 'bibtex-entry-format 'unify-case)
+  ;; (add-to-list 'bibtex-entry-format 'whitespace)
+  ;; (add-to-list 'bibtex-entry-format 'realign)
+  ;; (add-to-list 'bibtex-entry-format 'sort-fields)
+  (map! :map bibtex-mode-map
+        :localleader
+        "desc" "Clean entry" :n "c" #'bibtex-clean-entry
+        "desc" "Reformat"    :n "r" #'bibtex-reformat))
 
 
 (use-package! python
