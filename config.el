@@ -191,7 +191,8 @@
 
 (use-package! org-journal
   :init
-  (setq org-journal-file-header "#+TITLE: %d %B %Y\n\n"
+  (setq org-journal-dir "~/notes/private/journal"
+        org-journal-file-header "#+TITLE: %d %B %Y\n\n"
         org-journal-file-type 'weekly
         org-journal-date-format "%A, %d %B %Y"
         org-journal-file-format "%Y-%m-%d.org"
