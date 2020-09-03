@@ -189,26 +189,6 @@
         ;; and try to generate it, which might take time.
         org-id-track-globally t))
 
-(use-package! org-journal
-  :init
-  (setq org-journal-dir "~/notes/private/journal"
-        org-journal-file-header "#+TITLE: %d %B %Y\n\n"
-        org-journal-file-type 'weekly
-        org-journal-date-format "%A, %d %B %Y"
-        org-journal-file-format "%Y-%m-%d.org"
-        org-journal-enable-agenda-integration t)
-  :config
-  (map! :map calendar-mode-map :leader
-        :n "j m" 'org-journal-mark-entries
-        :n "j r" 'org-journal-read-entry
-        :n "j d" 'org-journal-display-entry
-        :n "] j" 'org-journal-next-entry
-        :n "[ j" 'org-journal-previous-entry
-        :n "j n" 'org-journal-new-date-entry
-        :n "j s w" 'org-journal-search-calendar-week
-        :n "j s m" 'org-journal-search-calendar-month
-        :n "j s y" 'org-journal-search-calendar-year))
-
 
 (use-package! evil-org
   :config
