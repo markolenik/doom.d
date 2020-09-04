@@ -10,6 +10,7 @@
   `(show-paren-match :foreground ,(doom-color 'bg)
                      :background ,(doom-color 'magenta) :weight bold))
 
+(ispell-change-dictionary "british")
 
 ;; Set font
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5))
@@ -42,7 +43,7 @@
       (:after evil
        "s-s" #'+evil-window-split-a
        "s-d" #'+evil-window-vsplit-a)
-      :after helm "s-f" #'helm-occur)
+      :after helm "s-o" #'helm-occur)
 
 
 (use-package! which-key
@@ -162,24 +163,12 @@
         "t" #'transpose-frame :desc "Transpose frame"))
 
 
-;; Note tacking and searching
-(use-package! deft
-  :init
-  (setq deft-directory "~/notes"
-        deft-recursive t
-        deft-file-naming-rules '((noslash . "_") (nospace . "_")
-                                 (case-fn . downcase)))
-  :config
-  (map! "C-<f15>" #'deft
-        "<f15>" #'deft-find-file))
-
-
+;; C-k bindgin shit in insert mode
 (use-package! org
   ;; `org-num-mode' shows nubmered headings
   ;; :hook (org-mode . org-num-mode)
   :init
-  (setq org-directory "~/notes/"
-        org-log-done 'time
+  (setq org-log-done 'note
         org-log-into-drawer t
         org-id-link-to-org-use-id t
         ;; Setting this to `t' is necessary in order to be able to link to
@@ -187,7 +176,8 @@
         ;; in my case, with lists all the files and their respective heading
         ;; IDs. If no such file is found, Emacs will go through all files
         ;; and try to generate it, which might take time.
-        org-id-track-globally t))
+        org-id-track-globally t
+        org-hide-emphasis-markers t))
 
 
 (use-package! evil-org
@@ -199,29 +189,38 @@
         :ien "C-S-h" nil))
 
 
-(use-package! org-roam
+(use-package! org-download
   :init
-  (setq org-roam-directory "~/notes"
+  (setq org-download-image-org-width 400))
+
+
+(use-package! org-roam
+  ;; `org-roam-directory' is set to "~/notes/org/roam" by doom
+  :init
+  (setq org-roam-db-gc-threshold most-positive-fixnum
         org-roam-tag-sources '(prop last-directory)
         +org-roam-open-buffer-on-find-file nil)
   ;; Set up templates
   (setq org-roam-capture-templates
-        '(("d" "default" plain (function org-roam-capture--get-point)
-           "%?"
-           :file-name "${slug}"
-           :head "#+TITLE: ${title}\n\n"
-           :unnarrowed t)
+        '(
+          ;; ("d" "default" plain (function org-roam-capture--get-point)
+          ;;  "%?" :file-name "${slug}"
+          ;;  :head "#+TITLE: ${title}\n\n"
+          ;;  :unnarrowed t)
+          ("d" "default" plain (function org-roam-capture--get-point)
+            "%?" :file-name "%<%Y%m%d%H%M%S>-${slug}"
+            :head "#+TITLE: ${title}\n"
+            :unnarrowed t)
           ("f" "fleeting" plain (function org-roam-capture--get-point)
            "%?"
-           :file-name "${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_TAGS: fleeting\n\n"
+           :file-name "fleeting/%<%Y%m%d%H%M%S>-${slug}"
+           :head "#+TITLE: ${title}\n\n"
            :unnarrowed t)
-          ;; ("b" "bib" plain (function org-roam-capture--get-point)
-          ;;  "%?"
-          ;;  :file-name "bib/${slug}"
-          ;;  :head
-          ;;  )
-          )
+          ("p" "private" plain (function org-roam-capture--get-point)
+           "%?"
+           :file-name "private/%<%Y%m%d%H%M%S>-${slug}"
+           :head "#+TITLE: ${title}\n\n"
+           :unnarrowed t))
         org-roam-capture-immediate-template
         '("d" "default" plain (function org-roam-capture--get-point)
           "%?"
@@ -237,7 +236,14 @@
            :file-name "web/${slug}"
            :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n
  - source :: ${ref}\n\n"
-           :unnarrowed t)))
+           :unnarrowed t))
+        org-roam-dailies-capture-templates
+        '(("d" "daily" plain #'org-roam-capture--get-point
+           ""
+           :file-name "private/dailies/%<%Y%m%d>"
+           ;; :head "#+TITLE: %<%Y-%m-%d>"
+           :head "#+TITLE: %<%A, %d %B %Y>"
+           :immediate-finish t)))
   :config
   (map!
    (:leader :prefix ("r" . "roam")
@@ -250,8 +256,7 @@
     :desc "Org Roam"                      "r" #'org-roam)
    (:map org-roam-backlinks-mode-map
     :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)
-   (:desc "Switch to roam buffer" :g "C-<f13>" #'org-roam-switch-to-buffer
-    :desc "Roam find file"        :g "<f14>" #'org-roam-find-file)))
+   (:desc "Switch to roam buffer" :g "M-<f13>" #'org-roam-switch-to-buffer)))
 
 
 (use-package! latex
@@ -278,14 +283,27 @@
         bibtex-autokey-titlewords-stretch 0)
   :config
   ;; Set type of formatting performed by `bibtex-clean-entry'
-  ;; (add-to-list 'bibtex-entry-format 'unify-case)
-  ;; (add-to-list 'bibtex-entry-format 'whitespace)
-  ;; (add-to-list 'bibtex-entry-format 'realign)
-  ;; (add-to-list 'bibtex-entry-format 'sort-fields)
+  (add-to-list 'bibtex-entry-format 'unify-case)
+  (add-to-list 'bibtex-entry-format 'whitespace)
+  (add-to-list 'bibtex-entry-format 'realign)
+  (add-to-list 'bibtex-entry-format 'sort-fields)
+  (bibtex-set-dialect 'BibTeX)
   (map! :map bibtex-mode-map
         :localleader
         "desc" "Clean entry" :n "c" #'bibtex-clean-entry
         "desc" "Reformat"    :n "r" #'bibtex-reformat))
+
+
+;; Note tacking and searching
+(use-package! deft
+  :init
+  (setq deft-directory org-roam-directory
+        deft-recursive t
+        deft-file-naming-rules '((noslash . "_") (nospace . "_")
+                                 (case-fn . downcase)))
+  :config
+  (map! "C-<f15>" #'deft
+        "<f15>" #'deft-find-file))
 
 
 (use-package! python
@@ -304,12 +322,14 @@ opening REPL buffer."
       nil t nil nil))))
 
 
-;; NOTE Not using it, due to interferences with TAB funtionality. Easier to call `org-roam-insert-immediate'.
-;; ;; BUG
-;; ;; You shouldn't have to change company-backends manually. There's something wrong
-;; ;; in `modules/lang/org/config.el'. I think they overwrite the backend.
-;; (use-package! company-org-roam
-;;   :when (featurep! :completion company)
-;;   :after org-roam
+(use-package! ranger
+  :init
+  (setq ranger-deer-show-details nil))
+
+;; (use-package! dired
+;;   :hook ((dired-mode . dired-hide-dotfiles-mode)
+;;          (dired-mode . dired-hide-details-mode))
 ;;   :config
-;;   (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
+;;   (map! :map dired-mode-map
+;;         :localleader
+;;         "." #'dired-hide-dotfiles-mode))
