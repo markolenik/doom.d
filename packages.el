@@ -10,5 +10,7 @@
 (package! evil-nerd-commenter :disable t)
 (package! evil-commentary)
 (package! jupyter)
+(package! org-ref)
+(package! org-roam-bibtex)
 
-(unpin! helm-bibtex org-roam)
+(unpin! bibtex-completion helm-bibtex org-roam company-org-roam)

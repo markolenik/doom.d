@@ -198,6 +198,20 @@
   (setq org-download-image-org-width 400))
 
 
+(use-package! org-ref
+  :after org
+  :init
+  (setq org-ref-notes-directory "~/org/roam/bib"
+        org-ref-default-bibliography '("~/bib/bibliography.bib")
+        org-ref-pdf-directory "~/bib"
+        ;; Why nil here?
+        org-ref-show-broken-links nil
+        org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+        ;; Use `org-roam-bibtex' to edit files
+        org-ref-notes-function 'orb-edit-notes))
+
+
+
 (use-package! org-roam
   ;; `org-roam-directory' is set to "~/org/roam" by doom
   :init
@@ -256,6 +270,18 @@
    (:map org-roam-backlinks-mode-map
     :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)
    (:desc "Switch to roam buffer" :g "M-<f13>" #'org-roam-switch-to-buffer)))
+
+
+(use-package! org-roam-bibtex
+  :after org-roam
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :init
+  (setq orb-templates
+        '(("b" "bib-note" plain #'org-roam-capture--get-point
+           "%?"
+           :file-name "bib/${citekey}"
+           :head "#+title: ${title}\n#+roam_key: ${ref}\n\n"
+           :unnarrowed t))))
 
 
 (use-package! latex
