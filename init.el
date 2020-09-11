@@ -25,12 +25,9 @@
 
 (doom! :input
        :completion
-       ;; (company +childframe); the ultimate code completion backend
        ;; +childframe looks more fancy but is slower and buggy
        (company +tng); the ultimate code completion backend
        (helm +fuzzy)             ; the *other* search engine for love and life
-       ;;ido               ; the other *other* search engine...
-       ;; ivy (ivy +fuzzy)              ; a search engine for love and life
 
        :ui
        deft              ; notational velocity for Emacs

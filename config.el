@@ -10,6 +10,8 @@
   `(show-paren-match :foreground ,(doom-color 'bg)
                      :background ,(doom-color 'magenta) :weight bold))
 
+(setq delete-by-moving-to-trash t)
+
 (ispell-change-dictionary "british")
 
 ;; Set font
@@ -99,7 +101,7 @@
   (setq helm-bibtex-full-frame t
         bibtex-completion-bibliography "~/bib/bibliography.bib"
         bibtex-completion-library-path "~/bib"
-        bibtex-completion-notes-path "~/notes/bib"
+        bibtex-completion-notes-path (concat org-roam-directory "bib/")
         bibtex-completion-pdf-field nil
         bibtex-completion-find-additional-pdfs t
         bibtex-completion-pdf-open-function
@@ -118,8 +120,10 @@
   (set-company-backend! '(text-mode prog-mode)
     'company-files)
   (map!
+    :i "C-l" #'+company/complete
    (:map company-active-map
-    "C-h" #'delete-backward-char
+    "C-l" #'company-complete-common
+    "C-h" #'backward-delete-char-untabify
     "C-S-h" #'company-show-doc-buffer)))
 
 
@@ -168,7 +172,7 @@
   ;; `org-num-mode' shows nubmered headings
   ;; :hook (org-mode . org-num-mode)
   :init
-  (setq org-log-done 'note
+  (setq org-log-done 'time
         org-log-into-drawer t
         org-id-link-to-org-use-id t
         ;; Setting this to `t' is necessary in order to be able to link to
@@ -195,36 +199,26 @@
 
 
 (use-package! org-roam
-  ;; `org-roam-directory' is set to "~/notes/org/roam" by doom
+  ;; `org-roam-directory' is set to "~/org/roam" by doom
   :init
   (setq org-roam-db-gc-threshold most-positive-fixnum
         org-roam-tag-sources '(prop last-directory)
         +org-roam-open-buffer-on-find-file nil)
   ;; Set up templates
   (setq org-roam-capture-templates
-        '(
-          ;; ("d" "default" plain (function org-roam-capture--get-point)
-          ;;  "%?" :file-name "${slug}"
-          ;;  :head "#+TITLE: ${title}\n\n"
-          ;;  :unnarrowed t)
-          ("d" "default" plain (function org-roam-capture--get-point)
-            "%?" :file-name "%<%Y%m%d%H%M%S>-${slug}"
-            :head "#+TITLE: ${title}\n"
-            :unnarrowed t)
+        '(("d" "default" plain (function org-roam-capture--get-point)
+           "%?" :file-name "%<%Y%m%d%H%M%S>-${slug}"
+           :head "#+TITLE: ${title}\n"
+           :unnarrowed t)
           ("f" "fleeting" plain (function org-roam-capture--get-point)
            "%?"
            :file-name "fleeting/%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n\n"
-           :unnarrowed t)
-          ("p" "private" plain (function org-roam-capture--get-point)
-           "%?"
-           :file-name "private/%<%Y%m%d%H%M%S>-${slug}"
            :head "#+TITLE: ${title}\n\n"
            :unnarrowed t))
         org-roam-capture-immediate-template
         '("d" "default" plain (function org-roam-capture--get-point)
           "%?"
-          :file-name "${slug}"
+          :file-name "%<%Y%m%d%H%M%S>-${slug}"
           :head "#+TITLE: ${title}\n\n"
           :unnarrowed t
           :immediate-finish t)
@@ -233,14 +227,14 @@
         org-roam-capture-ref-templates
         '(("r" "ref" plain (function org-roam-capture--get-point)
            "%?"
-           :file-name "web/${slug}"
+           :file-name "web/%<%Y%m%d%H%M%S>-${slug}"
            :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n
  - source :: ${ref}\n\n"
            :unnarrowed t))
         org-roam-dailies-capture-templates
         '(("d" "daily" plain #'org-roam-capture--get-point
            ""
-           :file-name "private/dailies/%<%Y%m%d>"
+           :file-name "dailies/%<%Y%m%d>"
            ;; :head "#+TITLE: %<%Y-%m-%d>"
            :head "#+TITLE: %<%A, %d %B %Y>"
            :immediate-finish t)))
@@ -253,7 +247,12 @@
     :desc "Show graph"                    "g" #'org-roam-graph
     :desc "Insert"                        "i" #'org-roam-insert
     :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
-    :desc "Org Roam"                      "r" #'org-roam)
+    :desc "Org Roam"                      "r" #'org-roam
+    (:prefix ("d" . "by date")
+     :desc "Arbitrary date" "d" #'org-roam-dailies-date
+     :desc "Today"          "t" #'org-roam-dailies-today
+     :desc "Tomorrow"       "m" #'org-roam-dailies-tomorrow
+     :desc "Yesterday"      "y" #'org-roam-dailies-yesterday))
    (:map org-roam-backlinks-mode-map
     :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)
    (:desc "Switch to roam buffer" :g "M-<f13>" #'org-roam-switch-to-buffer)))
@@ -325,11 +324,3 @@ opening REPL buffer."
 (use-package! ranger
   :init
   (setq ranger-deer-show-details nil))
-
-;; (use-package! dired
-;;   :hook ((dired-mode . dired-hide-dotfiles-mode)
-;;          (dired-mode . dired-hide-details-mode))
-;;   :config
-;;   (map! :map dired-mode-map
-;;         :localleader
-;;         "." #'dired-hide-dotfiles-mode))
