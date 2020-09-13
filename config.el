@@ -52,12 +52,9 @@
         evil-ex-search-highlight-all nil
         evil-want-fine-undo t
         evil-split-window-below t
-        evil-vsplit-window-right t
-        evil-respect-visual-line-mode t)
+        evil-vsplit-window-right t)
   :config
-  (map! "M-o" #'+evil/insert-newline-below
-        "M-O" #'+evil/insert-newline-above
-        :n "ga" #'evil-switch-to-windows-last-buffer
+  (map! :n "ga" #'evil-switch-to-windows-last-buffer
         :n "0" #'doom/backward-to-bol-or-indent))
 
 
@@ -116,8 +113,8 @@
 
 (use-package! text-mode
   :config
-  ;; Don't highlight or number lines in `text-mode'
-  (remove-hook! 'text-mode-hook #'(hl-line-mode display-line-numbers-mode)))
+  (remove-hook! 'text-mode-hook #'(hl-line-mode hl-fill-column-mode))
+  (add-hook! 'text-mode-hook #'visual-fill-column-mode))
 
 
 ;; Tranpose window frames
@@ -348,3 +345,9 @@ opening REPL buffer."
 (use-package! ranger
   :init
   (setq ranger-deer-show-details nil))
+
+
+(use-package! git-gutter
+  :config
+  ;; Pointless to use git-gutter in org-mode, since I use visual lines anyway.
+  (add-to-list 'git-gutter:disabled-modes 'org-mode))

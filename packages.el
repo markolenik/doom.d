@@ -9,6 +9,7 @@
 ;; to replicate all features.
 (package! evil-nerd-commenter :disable t)
 (package! evil-commentary)
+(package! visual-fill-column)
 (package! jupyter)
 (package! org-ref)
 (package! org-roam-bibtex)
