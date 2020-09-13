@@ -12,5 +12,6 @@
 (package! jupyter)
 (package! org-ref)
 (package! org-roam-bibtex)
+(package! org-roam-server)
 
 (unpin! bibtex-completion helm-bibtex org-roam company-org-roam)

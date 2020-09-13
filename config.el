@@ -77,7 +77,7 @@
   :init
   (setq helm-move-to-line-cycle-in-source t)
   :config
-  (map! "<f13>" #'helm-mini
+  (map! "<f13>" #'helm-buffers-list
         "M-y" #'helm-show-kill-ring
         "M-m" #'helm-imenu
         (:leader
@@ -208,8 +208,8 @@
         org-ref-show-broken-links nil
         org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
         ;; Use `org-roam-bibtex' to edit files
+        ;; TODO Make this conditional
         org-ref-notes-function 'orb-edit-notes))
-
 
 
 (use-package! org-roam
@@ -272,6 +272,17 @@
    (:desc "Switch to roam buffer" :g "M-<f13>" #'org-roam-switch-to-buffer)))
 
 
+;; Pretty note graphs
+(use-package! org-roam-server
+  :init
+  (setq org-roam-server-network-arrows 'from)
+  :config
+  ;; This is to fix a bug with Doom:
+  ;; https://github.com/org-roam/org-roam-server/issues/75
+  (unless (server-running-p)
+    (org-roam-server-mode)))
+
+
 (use-package! org-roam-bibtex
   :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)
@@ -324,6 +335,7 @@
   :init
   (setq deft-directory org-roam-directory
         deft-recursive t
+        deft-extensions '("org" "md" "text")
         deft-file-naming-rules '((noslash . "_") (nospace . "_")
                                  (case-fn . downcase)))
   :config

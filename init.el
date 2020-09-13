@@ -145,8 +145,11 @@
        ;;kotlin            ; a better, slicker Java(Script)
        (latex +latexmk
               +cdlatex
-              +lsp
-              +fold)             ; writing papers in Emacs has never been so fun
+              ;; fold fontifies stuff in place, but requires
+              ;; +fold
+              ;; lsp too slow
+              ;; +lsp
+              )
        ;;lean
        ;;factor
        ;;ledger            ; an accounting system in Emacs
