@@ -1,28 +1,22 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; Some functionality uses this to identify you, e.g. GPG configuration, email
-;; clients, file templates and snippets.
+;; Use config
 (setq user-full-name "Mark Olenik"
       user-mail-address "mark.olenik@gmail.com")
 
-(setq doom-theme 'doom-vibrant)
+;; Set doom looks
+(setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
+      doom-theme 'doom-vibrant
+      display-line-numbers-type nil)
 (custom-set-faces!
   `(show-paren-match :foreground ,(doom-color 'bg)
                      :background ,(doom-color 'magenta) :weight bold))
-
-(setq delete-by-moving-to-trash t)
-
-;; (ispell-change-dictionary "british")
-(setq ispell-personal-dictionary "~/.aspell.en.pws")
-
-;; Set font
-(setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5))
-
-(setq confirm-kill-emacs nil)
-
 (scroll-bar-mode 1)
 
-(setq display-line-numbers-type nil)
+;; Some common options
+(setq delete-by-moving-to-trash t
+      ispell-personal-dictionary "~/.aspell.en.pws"
+      confirm-kill-emacs nil)
 
 
 ;; Setup some readline keys etc
@@ -30,7 +24,6 @@
       :ige "C-d" #'delete-forward-char
       "C-S-h" #'help-command
       "M-u" #'universal-argument)
-
 
 ;; Convenient keys
 (map! "s-`" #'other-window
@@ -45,8 +38,7 @@
       "s-a" #'mark-whole-buffer
       (:after evil
        "s-s" #'+evil-window-split-a
-       "s-d" #'+evil-window-vsplit-a)
-      :after helm "s-o" #'helm-occur)
+       "s-d" #'+evil-window-vsplit-a))
 
 
 (use-package! which-key
@@ -70,34 +62,14 @@
 
 
 (use-package! evil-snipe
+  :after evil
   :init
   (setq evil-snipe-spillover-scope 'visible))
 
 
-(use-package! helm
-  :init
-  (setq helm-move-to-line-cycle-in-source t)
-  :config
-  (map! "<f13>" #'helm-buffers-list
-        "M-y" #'helm-show-kill-ring
-        "M-m" #'helm-imenu
-        (:leader
-         :n "ss" #'helm-occur
-         :n "C-." #'helm-recentf)
-        (:map helm-map
-         "C-h" #'delete-backward-char
-         "M-O" #'helm-ff-run-open-file-with-default-tool
-         "M-j" #'helm-next-source
-         "M-k" #'helm-previous-source)
-        (:map helm-find-files-map
-         "C-l" #'helm-execute-persistent-action)
-        (:map helm-read-file-map
-         "C-l" #'helm-execute-persistent-action)))
-
-
-
 ;; I prefer this over `evil-nerd-commenter'
 (use-package! evil-commentary
+  :after evil
   :config
   (evil-commentary-mode)
   (map! "M-/" #'evil-commentary-line
@@ -107,6 +79,7 @@
 
 ;; Perform operations on surroundings (brackets, quotes etc).
 (use-package! evil-surround
+  :after evil
   :config
   (evil-add-to-alist
    'evil-surround-pairs-alist
@@ -120,6 +93,12 @@
    ;; By default < should insert angle brackets, not tag.
    ;; For tag insertion use "t".
    ?\< '("<" . ">")))
+
+
+(use-package! ivy
+  :config
+  (map! "<f13>" #'ivy-switch-buffer
+        "M-y" #'counsel-yank-pop))
 
 
 ;; Sane company defaults
@@ -149,7 +128,7 @@
         "t" #'transpose-frame :desc "Transpose frame"))
 
 
-;; C-k bindgin shit in insert mode
+;; TODO C-k binding shit in insert mode
 (use-package! org
   ;; `org-num-mode' shows nubmered headings
   ;; :hook (org-mode . org-num-mode)
@@ -169,6 +148,7 @@
 
 
 (use-package! evil-org
+  :after (evil org)
   :config
   (map! :map evil-org-mode-map
         ;; Free readline bindings
@@ -178,23 +158,10 @@
 
 
 (use-package! org-download
+  :after org
   :init
   (setq org-download-image-org-width 400
         org-download-heading-lvl nil))
-
-
-(use-package! org-ref
-  :after org
-  :init
-  (setq org-ref-notes-directory "~/org/roam/bib"
-        org-ref-default-bibliography '("~/bib/bibliography.bib")
-        org-ref-pdf-directory "~/bib"
-        ;; Why nil here?
-        org-ref-show-broken-links nil
-        org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
-        ;; Use `org-roam-bibtex' to edit files
-        ;; TODO Make this conditional
-        org-ref-notes-function 'orb-edit-notes))
 
 
 (use-package! org-roam
@@ -238,6 +205,7 @@
            :immediate-finish t)))
   :config
   (map!
+   "M-<f13>" #'org-roam-switch-to-buffer
    (:leader :prefix ("r" . "roam")
     :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
     :desc "Org Roam Capture"              "c" #'org-roam-capture
@@ -252,8 +220,8 @@
      :desc "Tomorrow"       "m" #'org-roam-dailies-tomorrow
      :desc "Yesterday"      "y" #'org-roam-dailies-yesterday))
    (:map org-roam-backlinks-mode-map
-    :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)
-   (:desc "Switch to roam buffer" :g "M-<f13>" #'org-roam-switch-to-buffer)))
+    :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)))
+
 
 
 ;; Pretty note graphs
@@ -277,6 +245,20 @@
            :file-name "bib/${citekey}"
            :head "#+title: ${title}\n#+roam_key: ${ref}\n\n"
            :unnarrowed t))))
+
+
+(use-package! org-ref
+  :after (org org-roam)
+  :init
+  (setq org-ref-notes-directory (concat org-roam-directory "bib/")
+        org-ref-default-bibliography '("~/bib/bibliography.bib")
+        org-ref-pdf-directory "~/bib"
+        ;; Why nil here?
+        org-ref-show-broken-links nil
+        org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+        ;; Use `org-roam-bibtex' to edit files
+        ;; TODO Make this conditional
+        org-ref-notes-function 'orb-edit-notes))
 
 
 (use-package! latex
@@ -314,19 +296,17 @@
         "desc" "Reformat"    :n "r" #'bibtex-reformat))
 
 
-(use-package! helm-bibtex
-  :after helm
+(use-package! ivy-bibtex
+  :after (ivy org-roam)
   :defer t
   :init
-  (setq helm-bibtex-full-frame t
-        bibtex-completion-bibliography "~/bib/bibliography.bib"
+  (setq bibtex-completion-bibliography "~/bib/bibliography.bib"
         bibtex-completion-library-path "~/bib"
         bibtex-completion-notes-path (concat org-roam-directory "bib/")
         bibtex-completion-pdf-field nil
         bibtex-completion-find-additional-pdfs t
         bibtex-completion-pdf-open-function
-        (lambda (fpath)
-          (call-process "xdg-open" nil 0 nil fpath))
+        (lambda (fpath) (call-process "xdg-open" nil 0 nil fpath))
         bibtex-completion-notes-template-multiple-files
         (concat
          "#+ROAM_ALIAS: \"${=key=}\"\n"
@@ -337,14 +317,16 @@
 ;; Note tacking and searching
 (use-package! deft
   :init
-  (setq deft-directory org-roam-directory
+  (setq deft-directory org-directory
         deft-recursive t
-        deft-extensions '("org" "md" "text")
+        deft-extensions '("org" "md" "text" "txt")
         deft-file-naming-rules '((noslash . "_") (nospace . "_")
                                  (case-fn . downcase)))
   :config
-  (map! "C-<f15>" #'deft
-        "<f15>" #'deft-find-file))
+  (map! "<f15>" #'deft
+        "<f14>" #'deft-find-file
+        (:map deft-mode-map
+         :desc "Close Deft buffer" :n "q" #'kill-this-buffer)))
 
 
 (use-package! python
