@@ -181,7 +181,8 @@
         ;; IDs. If no such file is found, Emacs will go through all files
         ;; and try to generate it, which might take time.
         org-id-track-globally t
-        org-hide-emphasis-markers t))
+        org-hide-emphasis-markers t
+        org-startup-with-latex-preview t))
 
 
 (use-package! evil-org
@@ -195,7 +196,8 @@
 
 (use-package! org-download
   :init
-  (setq org-download-image-org-width 400))
+  (setq org-download-image-org-width 400
+        org-download-heading-lvl nil))
 
 
 (use-package! org-ref
@@ -222,18 +224,18 @@
   (setq org-roam-capture-templates
         '(("d" "default" plain (function org-roam-capture--get-point)
            "%?" :file-name "%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n"
+           :head "* ${title}\n"
            :unnarrowed t)
           ("f" "fleeting" plain (function org-roam-capture--get-point)
            "%?"
            :file-name "fleeting/%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n\n"
+           :head "* ${title}\n"
            :unnarrowed t))
         org-roam-capture-immediate-template
         '("d" "default" plain (function org-roam-capture--get-point)
           "%?"
           :file-name "%<%Y%m%d%H%M%S>-${slug}"
-          :head "#+TITLE: ${title}\n\n"
+          :head "* ${title}\n"
           :unnarrowed t
           :immediate-finish t)
         ;; roam-ref protocol: Create new note linked to a website reference.
@@ -242,15 +244,14 @@
         '(("r" "ref" plain (function org-roam-capture--get-point)
            "%?"
            :file-name "web/%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n
+           :head "#+ROAM_KEY: ${ref}\n\n* ${title}\n
  - source :: ${ref}\n\n"
            :unnarrowed t))
         org-roam-dailies-capture-templates
         '(("d" "daily" plain #'org-roam-capture--get-point
            ""
            :file-name "dailies/%<%Y%m%d>"
-           ;; :head "#+TITLE: %<%Y-%m-%d>"
-           :head "#+TITLE: %<%A, %d %B %Y>"
+           :head "* %<%A, %d %B %Y>"
            :immediate-finish t)))
   :config
   (map!
@@ -328,6 +329,26 @@
         :localleader
         "desc" "Clean entry" :n "c" #'bibtex-clean-entry
         "desc" "Reformat"    :n "r" #'bibtex-reformat))
+
+
+(use-package! helm-bibtex
+  :after helm
+  :defer t
+  :init
+  (setq helm-bibtex-full-frame t
+        bibtex-completion-bibliography "~/bib/bibliography.bib"
+        bibtex-completion-library-path "~/bib"
+        bibtex-completion-notes-path (concat org-roam-directory "bib/")
+        bibtex-completion-pdf-field nil
+        bibtex-completion-find-additional-pdfs t
+        bibtex-completion-pdf-open-function
+        (lambda (fpath)
+          (call-process "xdg-open" nil 0 nil fpath))
+        bibtex-completion-notes-template-multiple-files
+        (concat
+         "#+ROAM_ALIAS: \"${=key=}\"\n"
+         "#+ROAM_KEY: cite:${=key=}\n\n"
+         "* ${title}\n")))
 
 
 ;; Note tacking and searching

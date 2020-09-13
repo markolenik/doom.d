@@ -13,5 +13,7 @@
 (package! org-ref)
 (package! org-roam-bibtex)
 (package! org-roam-server)
+;; Toggle org-mode latex fragment on cursor hover
+(package! org-fragtog)
 
 (unpin! bibtex-completion helm-bibtex org-roam company-org-roam)
