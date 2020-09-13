@@ -12,7 +12,8 @@
 
 (setq delete-by-moving-to-trash t)
 
-(ispell-change-dictionary "british")
+;; (ispell-change-dictionary "british")
+(setq ispell-personal-dictionary "~/.aspell.en.pws")
 
 ;; Set font
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5))
@@ -94,38 +95,6 @@
          "C-l" #'helm-execute-persistent-action)))
 
 
-(use-package! helm-bibtex
-  :after helm
-  :defer t
-  :init
-  (setq helm-bibtex-full-frame t
-        bibtex-completion-bibliography "~/bib/bibliography.bib"
-        bibtex-completion-library-path "~/bib"
-        bibtex-completion-notes-path (concat org-roam-directory "bib/")
-        bibtex-completion-pdf-field nil
-        bibtex-completion-find-additional-pdfs t
-        bibtex-completion-pdf-open-function
-        (lambda (fpath)
-          (call-process "xdg-open" nil 0 nil fpath))
-        bibtex-completion-notes-template-multiple-files
-        (concat
-         "#+TITLE: ${title}\n"
-         "#+ROAM_ALIAS: \"${=key=}\"\n"
-         "#+ROAM_KEY: cite:${=key=}\n\n")))
-
-
-;; Sane company defaults
-(use-package! company
-  :config
-  (set-company-backend! '(text-mode prog-mode)
-    'company-files)
-  (map!
-    :i "C-l" #'+company/complete
-   (:map company-active-map
-    "C-l" #'company-complete-common
-    "C-h" #'backward-delete-char-untabify
-    "C-S-h" #'company-show-doc-buffer)))
-
 
 ;; I prefer this over `evil-nerd-commenter'
 (use-package! evil-commentary
@@ -153,6 +122,19 @@
    ?\< '("<" . ">")))
 
 
+;; Sane company defaults
+(use-package! company
+  :config
+  (set-company-backend! '(text-mode prog-mode)
+    'company-files)
+  (map!
+    :i "C-l" #'+company/complete
+   (:map company-active-map
+    "C-l" #'company-complete-common
+    "C-h" #'backward-delete-char-untabify
+    "C-S-h" #'company-show-doc-buffer)))
+
+
 (use-package! text-mode
   :config
   ;; Don't highlight or number lines in `text-mode'
@@ -171,6 +153,7 @@
 (use-package! org
   ;; `org-num-mode' shows nubmered headings
   ;; :hook (org-mode . org-num-mode)
+  :hook (org-mode . org-fragtog-mode)
   :init
   (setq org-log-done 'time
         org-log-into-drawer t

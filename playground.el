@@ -79,7 +79,7 @@ ADD SOME EXPLANATION HERE...
 
 
 ;; Add suffix to notes
-(cd "~/org/roam/")
+;; (cd "~/org/roam/private")
 (defun mark/note-add-date (note)
   "Add date of last file modification as suffix to file name"
   (let ((last-modified (format-time-string "%Y%m%d%H%M%S"
@@ -87,6 +87,12 @@ ADD SOME EXPLANATION HERE...
                                             (file-attributes note)))))
     (rename-file note (format "%s-%s" last-modified (file-name-nondirectory note)))
     ))
-(let* ((notes-dir "~/notes/")
-       (notes (org-roam--directory-files-recursively notes-dir ".*\.org$")))
-         (mapcar #'mark/note-add-date notes))
+
+
+
+
+;; (let* ((notes-dir "~/org/")
+;;        (notes (org-roam--directory-files-recursively notes-dir ".*\.org$")))
+;;          (mapcar #'mark/note-add-date notes))
+
+

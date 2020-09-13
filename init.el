@@ -27,7 +27,7 @@
        :completion
        ;; +childframe looks more fancy but is slower and buggy
        (company +tng); the ultimate code completion backend
-       (helm +fuzzy)             ; the *other* search engine for love and life
+       ;; (helm +fuzzy)             ; the *other* search engine for love and life
 
        :ui
        deft              ; notational velocity for Emacs
@@ -84,8 +84,8 @@
 
        :checkers
        ;; syntax              ; tasing you for every semicolon you forget
-       ;; (spell +spell-fu)      ; tasing you for misspelling mispelling
-       (spell +flyspell)
+       (spell +spell-fu)      ; tasing you for misspelling mispelling
+       ;; (spell +flyspell)
        ;; grammar           ; tasing grammar mistake every you make
 
        :tools
