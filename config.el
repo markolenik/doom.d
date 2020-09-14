@@ -162,7 +162,7 @@
 
 
 (use-package! org-roam
-  ;; `org-roam-directory' is set to "~/org/roam" by doom
+  ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   :init
   (setq org-roam-db-gc-threshold most-positive-fixnum
         org-roam-tag-sources '(prop last-directory)
@@ -350,4 +350,12 @@ opening REPL buffer."
 (use-package! git-gutter
   :config
   ;; Pointless to use git-gutter in org-mode, since I use visual lines anyway.
-  (add-to-list 'git-gutter:disabled-modes 'org-mode))
+  (add-to-list 'git-gutter:disabled-modes 'org-mode)
+  (add-to-list 'git-gutter:disabled-modes 'tex-mode))
+
+
+(use-package! smartparens
+  :config
+  (sp-with-modes 'org-mode
+    (sp-local-pair "$" "$")
+    (sp-local-pair "\\[" "\\]")))
