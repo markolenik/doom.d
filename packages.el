@@ -1,6 +1,8 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
 
+(unpin! bibtex-completion org-roam)
+
 ;; Change frame splits
 (package! transpose-frame)
 
@@ -14,7 +16,9 @@
 (package! org-ref)
 (package! org-roam-bibtex)
 (package! org-roam-server)
+;; company-org-roam makes writing text very slow
+(package! company-org-roam :disable t)
 ;; Toggle org-mode latex fragment on cursor hover
 (package! org-fragtog)
 
-(unpin! bibtex-completion helm-bibtex org-roam company-org-roam)
+(package! el-patch)
