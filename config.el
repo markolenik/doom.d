@@ -211,6 +211,7 @@
            :head "* %<%A, %d %B %Y>"
            :immediate-finish t)))
   :config
+  (setq org-agenda-files (list (concat org-roam-directory "dailies")))
   (map!
    :g "<f13>" #'org-roam-switch-to-buffer
    (:leader :prefix ("r" . "roam")
