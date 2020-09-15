@@ -142,6 +142,7 @@
   (setq org-log-done 'time
         org-log-into-drawer t
         org-id-link-to-org-use-id t
+        org-adapt-indentation nil
         ;; Setting this to `t' is necessary in order to be able to link to
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
@@ -149,7 +150,13 @@
         ;; and try to generate it, which might take time.
         org-id-track-globally t
         org-hide-emphasis-markers t
-        org-startup-with-latex-preview t))
+        org-startup-with-latex-preview t
+        ;; Add mathtools to latex packages.
+        org-latex-packages-alist '(("" "mathtools" t)))
+  :config
+  (setq org-startup-indented nil)
+  (when (featurep! :lang org +pretty)
+    (setq org-superstar-remove-leading-stars t)))
 
 
 (use-package! evil-org
