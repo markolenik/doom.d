@@ -280,6 +280,11 @@
     paragraph-separate "[ 	\f]*$"))
 
 
+(use-package! cdlatex
+  :init
+  (setq cdlatex-simplify-sub-super-scripts nil))
+
+
 (use-package! bibtex
   :init
   (setq bibtex-maintain-sorted-entries t
