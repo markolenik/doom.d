@@ -22,23 +22,26 @@
 ;; Setup some readline keys etc
 (map! :ige "C-h" #'delete-backward-char
       :ige "C-d" #'delete-forward-char
-      "C-S-h" #'help-command
-      "M-u" #'universal-argument)
+      :g "C-S-h" #'help-command
+      :g "M-u" #'universal-argument)
 
 ;; Convenient keys
-(map! "s-`" #'other-window
-      "s-n" #'+default/new-buffer
-      "s-N" #'make-frame
-      "s-h" #'windmove-left
-      "s-j" #'windmove-down
-      "s-k" #'windmove-up
-      "s-l" #'windmove-right
-      "s-1" #'doom/window-maximize-vertically
-      "s-0" #'delete-window
-      "s-a" #'mark-whole-buffer
+(map! :g "s-`" #'other-window
+      :g "s-n" #'+default/new-buffer
+      :g "s-N" #'make-frame
+      :g "s-h" #'windmove-left
+      :g "s-j" #'windmove-down
+      :g "s-k" #'windmove-up
+      :g "s-l" #'windmove-right
+      :g "s-1" #'doom/window-maximize-vertically
+      :g "s-0" #'delete-window
+      :g "s-a" #'mark-whole-buffer
       (:after evil
-       "s-s" #'+evil-window-split-a
-       "s-d" #'+evil-window-vsplit-a))
+       :g "s-s" #'+evil-window-split-a
+       :g "s-d" #'+evil-window-vsplit-a))
+
+
+(use-package! el-patch)
 
 
 (use-package! which-key
@@ -54,8 +57,11 @@
         evil-split-window-below t
         evil-vsplit-window-right t)
   :config
-  (map! :n "ga" #'evil-switch-to-windows-last-buffer
-        :n "0" #'doom/backward-to-bol-or-indent))
+  (map!
+   :g "M-o" #'+evil/insert-newline-below
+   :g "M-O" #'+evil/insert-newline-above
+   :n "ga" #'evil-switch-to-windows-last-buffer
+   :n "0" #'doom/backward-to-bol-or-indent))
 
 
 (use-package! evil-snipe
@@ -69,8 +75,8 @@
   :after evil
   :config
   (evil-commentary-mode)
-  (map! "M-/" #'evil-commentary-line
-        "C-M-/" #'evil-commentary-yank-line
+  (map! :g "M-/" #'evil-commentary-line
+        :g "C-M-/" #'evil-commentary-yank-line
         :nv "gc" #'evil-commentary))
 
 
@@ -94,8 +100,7 @@
 
 (use-package! ivy
   :config
-  (map! "<f13>" #'ivy-switch-buffer
-        "M-y" #'counsel-yank-pop))
+  (map! :g "M-y" #'counsel-yank-pop))
 
 
 ;; Sane company defaults
@@ -106,12 +111,14 @@
   (map!
     :i "C-l" #'+company/complete
    (:map company-active-map
-    "C-l" #'company-complete-common
-    "C-h" #'backward-delete-char-untabify
-    "C-S-h" #'company-show-doc-buffer)))
+    :g "C-l" #'company-complete-common
+    :g "C-h" #'backward-delete-char-untabify
+    :g "C-S-h" #'company-show-doc-buffer)))
 
 
 (use-package! text-mode
+  :init
+  (setq-hook! 'text-mode-hook fill-column 90)
   :config
   (remove-hook! 'text-mode-hook #'(hl-line-mode hl-fill-column-mode))
   (add-hook! 'text-mode-hook #'visual-fill-column-mode))
@@ -202,7 +209,7 @@
            :immediate-finish t)))
   :config
   (map!
-   "M-<f13>" #'org-roam-switch-to-buffer
+   :g "<f13>" #'org-roam-switch-to-buffer
    (:leader :prefix ("r" . "roam")
     :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
     :desc "Org Roam Capture"              "c" #'org-roam-capture
@@ -320,10 +327,24 @@
         deft-file-naming-rules '((noslash . "_") (nospace . "_")
                                  (case-fn . downcase)))
   :config
-  (map! "<f15>" #'deft
-        "<f14>" #'deft-find-file
+  (map! :g "<f15>" #'deft
+        :g "<f14>" #'deft-find-file
         (:map deft-mode-map
-         :desc "Close Deft buffer" :n "q" #'kill-this-buffer)))
+         :desc "Close Deft buffer" :n "q" #'kill-this-buffer))
+  :config/el-patch
+  (defun deft-parse-title (file contents)
+    "Parse the given FILE and CONTENTS and determine the title.
+If `deft-use-filename-as-title' is nil, the title is taken to
+be the first non-empty line of the FILE.  Else the base name of the FILE is
+used as title."
+    (el-patch-swap (if deft-use-filename-as-title
+                       (deft-base-filename file)
+                     (let ((begin (string-match "^.+$" contents)))
+                       (if begin
+                           (funcall deft-parse-title-function
+                                    (substring contents begin (match-end 0))))))
+                   (org-roam--get-title-or-slug file))))
+
 
 
 (use-package! python
