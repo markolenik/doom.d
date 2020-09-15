@@ -22,13 +22,14 @@
 ;; Setup some readline keys etc
 (map! :ige "C-h" #'delete-backward-char
       :ige "C-d" #'delete-forward-char
+      :ige "C-k" #'kill-line
       :g "C-S-h" #'help-command
       :g "M-u" #'universal-argument)
 
 ;; Convenient keys
 (map! :g "s-`" #'other-window
       :g "s-n" #'+default/new-buffer
-      :g "s-N" #'make-frame
+      :g "s-N" #'make-frame-command
       :g "s-h" #'windmove-left
       :g "s-j" #'windmove-down
       :g "s-k" #'windmove-up
@@ -158,7 +159,9 @@
         ;; Free readline bindings
         :ie "C-h" nil
         :ie "C-d" nil
-        :ien "C-S-h" nil))
+        :ien "C-S-h" nil
+        :i "C-k" nil
+        :i "C-j" nil))
 
 
 (use-package! org-download
