@@ -233,6 +233,8 @@
 
 ;; Pretty note graphs
 (use-package! org-roam-server
+  ;; Load this pacakge after org-roam is called.
+  :after-call org-roam
   :init
   (setq org-roam-server-network-arrows 'from)
   :config
