@@ -178,6 +178,7 @@
         org-download-heading-lvl nil))
 
 
+;; TODO Create tag command (with ivy support)
 (use-package! org-roam
   ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   :init
@@ -190,10 +191,10 @@
            "%?" :file-name "%<%Y%m%d%H%M%S>-${slug}"
            :head "* ${title}\n"
            :unnarrowed t)
-          ("f" "fleeting" plain (function org-roam-capture--get-point)
+          ("a" "action" plain (function org-roam-capture--get-point)
            "%?"
-           :file-name "fleeting/%<%Y%m%d%H%M%S>-${slug}"
-           :head "* ${title}\n"
+           :file-name "%<%Y%m%d%H%M%S>-${slug}"
+           :head "#+ROAM_TAGS: \"action\"\n\n* ${title}\n"
            :unnarrowed t))
         org-roam-capture-immediate-template
         '("d" "default" plain (function org-roam-capture--get-point)
