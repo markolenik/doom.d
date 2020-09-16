@@ -156,7 +156,9 @@
   :config
   (setq org-startup-indented nil)
   (when (featurep! :lang org +pretty)
-    (setq org-superstar-remove-leading-stars t)))
+    (setq org-superstar-remove-leading-stars t))
+  (map! :map org-mode-map
+        :in "M-h" nil))
 
 
 (use-package! evil-org
@@ -168,7 +170,8 @@
         :ie "C-d" nil
         :ien "C-S-h" nil
         :i "C-k" nil
-        :i "C-j" nil))
+        :i "C-j" nil
+        :in "M-h" nil))
 
 
 (use-package! org-download
@@ -189,18 +192,18 @@
   (setq org-roam-capture-templates
         '(("d" "default" plain (function org-roam-capture--get-point)
            "%?" :file-name "%<%Y%m%d%H%M%S>-${slug}"
-           :head "* ${title}\n"
+           :head "#+TITLE: ${title}\n"
            :unnarrowed t)
           ("a" "action" plain (function org-roam-capture--get-point)
            "%?"
            :file-name "%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+ROAM_TAGS: \"action\"\n\n* ${title}\n"
+           :head "#+TITLE: ${title}\n#+ROAM_TAGS: \"action\"\n"
            :unnarrowed t))
         org-roam-capture-immediate-template
         '("d" "default" plain (function org-roam-capture--get-point)
           "%?"
           :file-name "%<%Y%m%d%H%M%S>-${slug}"
-          :head "* ${title}\n"
+          :head "#+TITLE ${title}\n"
           :unnarrowed t
           :immediate-finish t)
         ;; roam-ref protocol: Create new note linked to a website reference.
@@ -209,14 +212,14 @@
         '(("r" "ref" plain (function org-roam-capture--get-point)
            "%?"
            :file-name "web/%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+ROAM_KEY: ${ref}\n\n* ${title}\n
+           :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n
  - source :: ${ref}\n\n"
            :unnarrowed t))
         org-roam-dailies-capture-templates
         '(("d" "daily" plain #'org-roam-capture--get-point
            ""
            :file-name "dailies/%<%Y%m%d>"
-           :head "* %<%A, %d %B %Y>"
+           :head "#+TITLE: %<%A, %d %B %Y>"
            :immediate-finish t)))
   :config
   (setq org-agenda-files (list (concat org-roam-directory "dailies")))
@@ -261,7 +264,7 @@
         '(("b" "bib-note" plain #'org-roam-capture--get-point
            "%?"
            :file-name "bib/${citekey}"
-           :head "#+title: ${title}\n#+roam_key: ${ref}\n\n"
+           :head "#+TITLE: ${title}\n#+roam_key: ${ref}\n\n"
            :unnarrowed t))))
 
 
