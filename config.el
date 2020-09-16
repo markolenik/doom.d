@@ -203,7 +203,11 @@
         '("d" "default" plain (function org-roam-capture--get-point)
           "%?"
           :file-name "%<%Y%m%d%H%M%S>-${slug}"
+<<<<<<< HEAD
           :head "#+TITLE: ${title}\n"
+=======
+          :head "#+TITLE ${title}\n"
+>>>>>>> 3e0ca84f085c51ff83ff24ae71fa4f4679c731c6
           :unnarrowed t
           :immediate-finish t)
         ;; roam-ref protocol: Create new note linked to a website reference.
