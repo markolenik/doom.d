@@ -15,7 +15,6 @@
 
 ;; Some common options
 (setq delete-by-moving-to-trash t
-      ispell-personal-dictionary "~/.aspell.en.pws"
       confirm-kill-emacs nil)
 
 
@@ -197,7 +196,7 @@
           ("a" "action" plain (function org-roam-capture--get-point)
            "%?"
            :file-name "%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_TAGS: \"#action\"\n"
+           :head "#+TITLE: ${title}\n#+ROAM_TAGS: \"action\"\n"
            :unnarrowed t))
         org-roam-capture-immediate-template
         '("d" "default" plain (function org-roam-capture--get-point)
