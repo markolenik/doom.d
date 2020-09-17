@@ -356,7 +356,9 @@
   (map! :g "<f15>" #'deft
         :g "<f14>" #'deft-find-file
         (:map deft-mode-map
-         :desc "Close Deft buffer" :n "q" #'kill-this-buffer))
+         :desc "Close Deft buffer" :n "q" #'kill-this-buffer
+         :i "C-h" #'deft-filter-decrement
+         :i "C-w" #'deft-filter-decrement-word))
   :config/el-patch
   (defun deft-parse-title (file contents)
     "Parse the given FILE and CONTENTS and determine the title.
