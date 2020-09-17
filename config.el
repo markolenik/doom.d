@@ -212,8 +212,7 @@
         '(("r" "ref" plain (function org-roam-capture--get-point)
            "%?"
            :file-name "web/%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n
- - source :: ${ref}\n\n"
+           :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n\n"
            :unnarrowed t))
         org-roam-dailies-capture-templates
         '(("d" "daily" plain #'org-roam-capture--get-point
