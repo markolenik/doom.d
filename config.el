@@ -401,3 +401,8 @@ opening REPL buffer."
   (sp-with-modes 'org-mode
     (sp-local-pair "$" "$")
     (sp-local-pair "\\[" "\\]")))
+
+
+(when (featurep! :ui workspaces)
+  (map! :gn "<C-tab>" #'+workspace/switch-right
+        :gn "<C-iso-lefttab>" #'+workspace/switch-left))
