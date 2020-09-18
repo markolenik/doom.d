@@ -369,7 +369,6 @@ used as title."
                    (org-roam--get-title-or-slug file))))
 
 
-
 (use-package! python
   :init
   (setq jupyter-repl-echo-eval-p nil
@@ -392,10 +391,9 @@ opening REPL buffer."
 
 
 (use-package! git-gutter
-  :config
+  :init
   ;; Pointless to use git-gutter in org-mode, since I use visual lines anyway.
-  (add-to-list 'git-gutter:disabled-modes 'org-mode)
-  (add-to-list 'git-gutter:disabled-modes 'tex-mode))
+  (setq git-gutter:disabled-modes '(org-mode image-mode latex-mode)))
 
 
 (use-package! smartparens
