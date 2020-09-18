@@ -231,6 +231,7 @@
     :desc "Insert"                        "i" #'org-roam-insert
     :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
     :desc "Org Roam"                      "r" #'org-roam
+    :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
     (:prefix ("d" . "by date")
      :desc "Arbitrary date" "d" #'org-roam-dailies-date
      :desc "Today"          "t" #'org-roam-dailies-today
