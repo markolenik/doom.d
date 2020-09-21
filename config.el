@@ -263,7 +263,7 @@
         '(("b" "bib-note" plain #'org-roam-capture--get-point
            "%?"
            :file-name "bib/${citekey}"
-           :head "#+TITLE: ${title}\n#+roam_key: ${ref}\n\n"
+           :head "#+TITLE: ${title}\n#+ROAM_ALIAS: \"${=key=}\"\n#+ROAM_KEY: ${ref}\n\n"
            :unnarrowed t))))
 
 
@@ -334,9 +334,9 @@
         (lambda (fpath) (call-process "xdg-open" nil 0 nil fpath))
         bibtex-completion-notes-template-multiple-files
         (concat
+         "#+TITLE: ${title}\n"
          "#+ROAM_ALIAS: \"${=key=}\"\n"
-         "#+ROAM_KEY: cite:${=key=}\n\n"
-         "* ${title}\n")))
+         "#+ROAM_KEY: cite:${=key=}\n\n")))
 
 
 ;; Note tacking and searching
