@@ -132,7 +132,10 @@
         "t" #'transpose-frame :desc "Transpose frame"))
 
 
-;; TODO C-k binding shit in insert mode
+;; TODO Set `org-tags-alist' to have common tags in org-roam
+;; Not sure if setting here best solution though, would be better if
+;; tags would be read from all files, see org-agenda ...
+;; TODO efficient org-agenda?
 (use-package! org
   ;; `org-num-mode' shows nubmered headings
   ;; :hook (org-mode . org-num-mode)
@@ -151,7 +154,10 @@
         org-hide-emphasis-markers t
         org-startup-with-latex-preview t
         ;; Add mathtools to latex packages.
-        org-latex-packages-alist '(("" "mathtools" t)))
+        org-latex-packages-alist '(("" "mathtools" t))
+        ;; org-attach should attach to relative dir, not absolute.
+        ;; Otherwise hard to version control attachments.
+        org-attach-id-dir ".attach/")
   :config
   (setq org-startup-indented nil)
   (when (featurep! :lang org +pretty)
@@ -173,6 +179,7 @@
         :in "M-h" nil))
 
 
+;; TODO Don't attach text files when dragndrop.
 (use-package! org-download
   :after org
   :init
@@ -181,6 +188,8 @@
 
 
 ;; TODO Create tag command (with ivy support)
+;; TODO org-roam and org-agenda?
+;; TODO Why does automatic file rename not work on title change?
 (use-package! org-roam
   ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   :init
@@ -403,6 +412,8 @@ opening REPL buffer."
     (sp-local-pair "\\[" "\\]")))
 
 
+;; TODO Don't open new windows in new workspace, open in either
+;; a given workspace, or just the last used workspace.
 (when (featurep! :ui workspaces)
   (map! :gn "<C-tab>" #'+workspace/switch-right
         :gn "<C-iso-lefttab>" #'+workspace/switch-left))
