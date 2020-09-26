@@ -145,6 +145,7 @@
         org-log-into-drawer t
         org-id-link-to-org-use-id t
         org-adapt-indentation nil
+        org-startup-folded 'showall
         ;; Setting this to `t' is necessary in order to be able to link to
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
