@@ -233,6 +233,10 @@
   (setq org-agenda-files (list (concat org-roam-directory "dailies")))
   (map!
    :g "<f13>" #'org-roam-switch-to-buffer
+   :g "<f14>" #'org-roam-find-file-immediate
+   :g "<C-f14>" #'org-roam-find-file
+   :g "<menu>" #'org-roam-insert-immediate
+   :g "<C-menu>" #'org-roam-insert
    (:leader :prefix ("r" . "roam")
     :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
     :desc "Org Roam Capture"              "c" #'org-roam-capture
@@ -359,7 +363,6 @@
                                  (case-fn . downcase)))
   :config
   (map! :g "<f15>" #'deft
-        :g "<f14>" #'deft-find-file
         (:map deft-mode-map
          :desc "Close Deft buffer" :n "q" #'kill-this-buffer
          :i "C-h" #'deft-filter-decrement
