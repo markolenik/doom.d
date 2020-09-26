@@ -1,7 +1,7 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
 
-(unpin! bibtex-completion org-roam)
+(unpin! bibtex-completion helm-bibtex org-roam)
 (disable-packages! company-org-roam evil-nerd-commenter)
 
 ;; Change frame splits
