@@ -420,4 +420,6 @@ opening REPL buffer."
 ;; a given workspace, or just the last used workspace.
 (when (featurep! :ui workspaces)
   (map! :gn "<C-tab>" #'+workspace/switch-right
-        :gn "<C-iso-lefttab>" #'+workspace/switch-left))
+        :gn "<C-iso-lefttab>" #'+workspace/switch-left
+        :gn "C-S-t" #'+workspace/new
+        :gn "C-S-w" #'+workspace/delete))
