@@ -143,8 +143,8 @@
   :hook (org-mode . org-fragtog-mode)
   :init
   (setq org-log-done 'time
-        org-log-into-drawer t
         org-id-link-to-org-use-id t
+        org-log-done nil
         org-adapt-indentation nil
         org-startup-folded 'showall
         ;; Setting this to `t' is necessary in order to be able to link to
