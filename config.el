@@ -192,6 +192,9 @@
 ;; TODO Create tag command (with ivy support)
 ;; TODO org-roam and org-agenda?
 ;; TODO Why does automatic file rename not work on title change?
+;; BUG duplicate ids everywhere, but I can only find always one id
+;; For now I've disabled logging of duplicate ids, but that's not a longterm
+;; solution. Google. I'm sure someone else has encountered this problem.
 (use-package! org-roam
   ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   :init
