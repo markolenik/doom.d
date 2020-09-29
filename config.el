@@ -100,7 +100,8 @@
 
 (use-package! ivy
   :config
-  (map! :g "M-y" #'counsel-yank-pop))
+  (map! :g "M-y" #'counsel-yank-pop
+        :g "<f13>" #'ivy-switch-buffer))
 
 
 ;; Sane company defaults
@@ -232,7 +233,7 @@
   :config
   (setq org-agenda-files (list (concat org-roam-directory "dailies")))
   (map!
-   :g "<f13>" #'org-roam-switch-to-buffer
+   :g "C-<f13>" #'org-roam-switch-to-buffer
    :g "<f14>" #'org-roam-find-file-immediate
    :g "<C-f14>" #'org-roam-find-file
    :g "<menu>" #'org-roam-insert-immediate
