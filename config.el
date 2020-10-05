@@ -156,7 +156,9 @@
         org-hide-emphasis-markers t
         org-startup-with-latex-preview t
         ;; Add mathtools to latex packages.
-        org-latex-packages-alist '(("" "mathtools" t))
+        org-latex-packages-alist '(("" "mathtools" t)
+                                   ("" "bm" t)
+                                   ("" "amssymb" t))
         ;; org-attach should attach to relative dir, not absolute.
         ;; Otherwise hard to version control attachments.
         org-attach-id-dir ".attach/")
