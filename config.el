@@ -243,6 +243,7 @@
    :g "<C-f14>" #'org-roam-find-file
    :g "<menu>" #'org-roam-insert-immediate
    :g "<C-menu>" #'org-roam-insert
+   :g "<f9>" #'org-roam-db-build-cache
    (:leader :prefix ("r" . "roam")
     :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
     :desc "Org Roam Capture"              "c" #'org-roam-capture
