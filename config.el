@@ -121,7 +121,7 @@
   :init
   (setq-hook! 'text-mode-hook fill-column 90)
   :config
-  (remove-hook! 'text-mode-hook #'(hl-line-mode hl-fill-column-mode))
+  (remove-hook! 'text-mode-hook #'(hl-line-mode +fill-column-enable-h))
   (add-hook! 'text-mode-hook #'visual-fill-column-mode))
 
 
