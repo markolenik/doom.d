@@ -12,7 +12,7 @@
        :completion
        ;; +childframe looks more fancy but is slower and buggy
        (company +tng); the ultimate code completion backend
-       (ivy +fuzzy +prescient +icons)
+       (ivy +prescient +icons)
 
        :ui
        deft              ; notational velocity for Emacs
