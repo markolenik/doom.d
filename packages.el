@@ -17,3 +17,5 @@
 (package! org-fragtog)
 
 (package! el-patch)
+
+(package! super-save)

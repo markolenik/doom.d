@@ -429,3 +429,9 @@ opening REPL buffer."
         :gn "<C-iso-lefttab>" #'+workspace/switch-left
         :gn "C-S-t" #'+workspace/new
         :gn "C-S-w" #'+workspace/delete))
+
+
+(use-package! super-save
+  :init
+  (setq super-save-auto-save-when-idle t)
+  (super-save-mode 1))
