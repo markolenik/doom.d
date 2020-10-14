@@ -161,7 +161,10 @@
                                    ("" "amssymb" t))
         ;; org-attach should attach to relative dir, not absolute.
         ;; Otherwise hard to version control attachments.
-        org-attach-id-dir ".attach/")
+        org-attach-id-dir ".attach/"
+        org-tag-alist '(("QUESTION" . ?q) ; Unanswered question
+                        ("NOTE" . ?n)     ; Turn this heading into a note
+                        ("IDEA" . ?i)))   ; Some idea
   :config
   (setq org-startup-indented nil)
   (when (featurep! :lang org +pretty)
