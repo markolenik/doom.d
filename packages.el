@@ -2,7 +2,7 @@
 ;;; $DOOMDIR/packages.el
 
 (unpin! bibtex-completion helm-bibtex org-roam)
-(disable-packages! company-org-roam evil-nerd-commenter)
+(disable-packages! evil-nerd-commenter)
 
 ;; Change frame splits
 (package! transpose-frame)

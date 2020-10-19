@@ -1,12 +1,15 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; Use config
+;; User config
 (setq user-full-name "Mark Olenik"
       user-mail-address "mark.olenik@gmail.com")
 
+(setq ispell-personal-dictionary "~/.aspell.en.pws")
+
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
-      doom-theme 'doom-vibrant
+      ;; doom-theme 'doom-vibrant
+      ;; doom-theme 'doom-monokai-pro
       display-line-numbers-type nil)
 (custom-set-faces!
   `(show-paren-match :foreground ,(doom-color 'bg)
@@ -143,7 +146,7 @@
   :hook (org-mode . org-fragtog-mode)
   :init
   (setq org-log-done 'time
-        org-id-link-to-org-use-id t
+        ;; org-id-link-to-org-use-id t
         org-log-done nil
         org-adapt-indentation nil
         org-startup-folded 'showall
@@ -152,7 +155,7 @@
         ;; in my case, with lists all the files and their respective heading
         ;; IDs. If no such file is found, Emacs will go through all files
         ;; and try to generate it, which might take time.
-        org-id-track-globally t
+        ;; org-id-track-globally t
         org-hide-emphasis-markers t
         org-startup-with-latex-preview t
         ;; Add mathtools to latex packages.
@@ -432,10 +435,12 @@ opening REPL buffer."
   (map! :gn "<C-tab>" #'+workspace/switch-right
         :gn "<C-iso-lefttab>" #'+workspace/switch-left
         :gn "C-S-t" #'+workspace/new
-        :gn "C-S-w" #'+workspace/delete))
+        :gn "C-S-w" #'+workspace/delete
+        :gn "C-S-r" #'+workspace/re))
 
 
 (use-package! super-save
   :init
-  (setq super-save-auto-save-when-idle t)
+  (setq super-save-auto-save-when-idle t
+        super-save-idle-duration 180)
   (super-save-mode 1))

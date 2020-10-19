@@ -96,3 +96,7 @@ ADD SOME EXPLANATION HERE...
 ;;          (mapcar #'mark/note-add-date notes))
 
 
+
+(defun mark/remove-unused-properties ()
+  (interactive)
+  )
