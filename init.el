@@ -23,7 +23,7 @@
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        hydra
        ;; indent-guides     ; highlighted indent columns
-       minimap           ; show a map of the code on the side
+       ;; minimap           ; show a map of the code on the side
        (modeline +light)          ; snazzy, Atom-inspired modeline, plus API
        nav-flash         ; blink cursor line after big motions
        ophints           ; highlight the region an operation acts on
@@ -53,8 +53,7 @@
        word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
-       (dired +icons
-              +ranger)             ; making dired pretty [functional]
+       (dired +icons)             ; making dired pretty [functional]
        electric          ; smarter, keyword-based electric-indent
        ibuffer         ; interactive buffer management
        undo              ; persistent, smarter undo for your inevitable mistakes
@@ -68,7 +67,7 @@
 
        :checkers
        ;; syntax              ; tasing you for every semicolon you forget
-       (spell +spell-fu)      ; tasing you for misspelling mispelling
+       (spell +enchant +flyspell)      ; tasing you for misspelling mispelling
        ;; grammar           ; tasing grammar mistake every you make
 
        :tools

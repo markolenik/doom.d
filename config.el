@@ -4,12 +4,20 @@
 (setq user-full-name "Mark Olenik"
       user-mail-address "mark.olenik@gmail.com")
 
-(setq ispell-personal-dictionary "~/.aspell.en.pws")
+;; (setq ispell-personal-dictionary "~/.aspell.en.pws")
+;; (ispell-change-dictionary "en")
+
+(setq global-hl-line-modes nil)
 
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
-      ;; doom-theme 'doom-vibrant
+      doom-theme 'doom-vibrant
       ;; doom-theme 'doom-monokai-pro
+      ;; doom-theme 'doom-molokai
+      ;; doom-theme 'doom-monokai-classic
+      ;; doom-theme 'doom-monokai-spectrum
+      ;; doom-theme 'doom-laserwave
+      ;; doom-theme 'doom-city-lights
       display-line-numbers-type nil)
 (custom-set-faces!
   `(show-paren-match :foreground ,(doom-color 'bg)
@@ -124,7 +132,7 @@
   :init
   (setq-hook! 'text-mode-hook fill-column 90)
   :config
-  (remove-hook! 'text-mode-hook #'(hl-line-mode +fill-column-enable-h))
+  (remove-hook! 'text-mode-hook #'(+fill-column-enable-h))
   (add-hook! 'text-mode-hook #'visual-fill-column-mode))
 
 
@@ -149,7 +157,7 @@
         ;; org-id-link-to-org-use-id t
         org-log-done nil
         org-adapt-indentation nil
-        org-startup-folded 'showall
+        org-startup-folded 't
         ;; Setting this to `t' is necessary in order to be able to link to
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
@@ -208,7 +216,7 @@
   :init
   (setq org-roam-db-gc-threshold most-positive-fixnum
         org-roam-tag-sources '(prop last-directory)
-        +org-roam-open-buffer-on-find-file nil)
+        org-roam-buffer-position 'left)
   ;; Set up templates
   (setq org-roam-capture-templates
         '(("d" "default" plain (function org-roam-capture--get-point)
@@ -261,7 +269,7 @@
     :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
     (:prefix ("d" . "by date")
      :desc "Arbitrary date" "d" #'org-roam-dailies-date
-     :desc "Today"          "t" #'org-roam-dailies-today
+     :desc "Today"          "t" #'org-roam-dailies-find-today
      :desc "Tomorrow"       "m" #'org-roam-dailies-tomorrow
      :desc "Yesterday"      "y" #'org-roam-dailies-yesterday))
    (:map org-roam-backlinks-mode-map
@@ -269,17 +277,26 @@
 
 
 
-;; Pretty note graphs
-(use-package! org-roam-server
-  ;; Load this pacakge after org-roam is called.
-  :after-call org-roam
-  :init
-  (setq org-roam-server-network-arrows 'from)
-  :config
-  ;; This is to fix a bug with Doom:
-  ;; https://github.com/org-roam/org-roam-server/issues/75
-  (unless (server-running-p)
-    (org-roam-server-mode)))
+;; ;; Pretty note graphs
+;; (use-package! org-roam-server
+;;   ;; Load this pacakge after org-roam is called.
+;;   :after-call org-roam
+;;   :init
+;;   (setq org-roam-server-network-arrows 'from))
+
+;; ;; This is to fix a bug with Doom:
+;; ;; https://github.com/org-roam/org-roam-server/issues/115
+;; (defun org-roam-server-open ()
+;;   "Ensure the server is active, then open the roam graph."
+;;   (interactive)
+;;   (smartparens-global-mode -1)
+;;   (org-roam-server-mode 1)
+;;   (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))
+;;   (smartparens-global-mode 1))
+
+;; ;; automatically enable server-mode
+;; (after! org-roam
+;;   (org-roam-server-open))
 
 
 (use-package! org-roam-bibtex
@@ -322,7 +339,13 @@
 
 (use-package! cdlatex
   :init
-  (setq cdlatex-simplify-sub-super-scripts nil))
+  (setq cdlatex-simplify-sub-super-scripts nil
+        cdlatex-sub-super-scripts-outside-math-mode nil)
+  (setq cdlatex-env-alist
+        '(
+          ("equation*" "\\begin{equation*}\n?\n\\end{equation*}" nil)
+          ("beq*" "\\begin{equation*}\\boxed{\n?\n}\\end{equation*}" nil)
+          )))
 
 
 (use-package! bibtex
@@ -373,7 +396,10 @@
         deft-recursive t
         deft-extensions '("org" "md" "text" "txt")
         deft-file-naming-rules '((noslash . "_") (nospace . "_")
-                                 (case-fn . downcase)))
+                                 (case-fn . downcase))
+        deft-use-filename-as-title t
+        ;; deft-incremental-search nil
+        deft-file-limit 20)
   :config
   (map! :g "<f15>" #'deft
         (:map deft-mode-map
@@ -392,8 +418,7 @@ used as title."
                        (if begin
                            (funcall deft-parse-title-function
                                     (substring contents begin (match-end 0))))))
-                   (org-roam--get-title-or-slug file))))
-
+                   (org-roam-db--get-title file))))
 
 (use-package! python
   :init
@@ -411,9 +436,9 @@ opening REPL buffer."
       nil t nil nil))))
 
 
-(use-package! ranger
-  :init
-  (setq ranger-deer-show-details nil))
+;;(use-package! ranger
+;;  :init
+;;  (setq ranger-deer-show-details nil))
 
 
 (use-package! git-gutter
