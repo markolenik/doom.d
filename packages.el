@@ -19,3 +19,8 @@
 (package! el-patch)
 
 (package! super-save)
+
+(package! eclipse-theme)
+(package! darkokai-theme)
+(package! leuven-theme)
+(package! github-theme)

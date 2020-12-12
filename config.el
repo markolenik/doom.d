@@ -11,6 +11,10 @@
 
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
+      ;; doom-theme 'eclipse
+      ;; doom-theme 'leuven
+      ;; doom-theme 'github
+      ;; doom-theme 'doom-opera-light
       doom-theme 'doom-vibrant
       ;; doom-theme 'doom-monokai-pro
       ;; doom-theme 'doom-molokai
@@ -18,7 +22,9 @@
       ;; doom-theme 'doom-monokai-spectrum
       ;; doom-theme 'doom-laserwave
       ;; doom-theme 'doom-city-lights
+      ;; doom-theme 'doom-ephemeral
       display-line-numbers-type nil)
+
 (custom-set-faces!
   `(show-paren-match :foreground ,(doom-color 'bg)
                      :background ,(doom-color 'magenta) :weight bold))
@@ -112,7 +118,7 @@
 (use-package! ivy
   :config
   (map! :g "M-y" #'counsel-yank-pop
-        :g "<f13>" #'ivy-switch-buffer))
+        :g "<f13>" #'+ivy/switch-workspace-buffer))
 
 
 ;; Sane company defaults
@@ -181,7 +187,21 @@
   (when (featurep! :lang org +pretty)
     (setq org-superstar-remove-leading-stars t))
   (map! :map org-mode-map
-        :in "M-h" nil))
+        :in "M-h" nil)
+
+  ;; See bug with latex previews in org
+  ;; https://github.com/hlissner/emacs-solaire-mode/issues/24
+  (defun +org-update-latex-preview-background-color (&rest _)
+    (setq-default
+     org-format-latex-options
+     (plist-put org-format-latex-options
+                :background
+                (face-attribute (or (cadr (assq 'default face-remapping-alist))
+                                    'default)
+                                :background nil t))))
+  (advice-add #'load-theme :after #'+org-update-latex-preview-background-color)
+
+  )
 
 
 (use-package! evil-org
@@ -267,6 +287,7 @@
     :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
     :desc "Org Roam"                      "r" #'org-roam
     :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
+    :desc "Jump to index"                 "TAB" #'org-roam-jump-to-index
     (:prefix ("d" . "by date")
      :desc "Arbitrary date" "d" #'org-roam-dailies-date
      :desc "Today"          "t" #'org-roam-dailies-find-today
@@ -277,26 +298,23 @@
 
 
 
-;; ;; Pretty note graphs
-;; (use-package! org-roam-server
-;;   ;; Load this pacakge after org-roam is called.
-;;   :after-call org-roam
-;;   :init
-;;   (setq org-roam-server-network-arrows 'from))
-
-;; ;; This is to fix a bug with Doom:
-;; ;; https://github.com/org-roam/org-roam-server/issues/115
-;; (defun org-roam-server-open ()
-;;   "Ensure the server is active, then open the roam graph."
-;;   (interactive)
-;;   (smartparens-global-mode -1)
-;;   (org-roam-server-mode 1)
-;;   (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))
-;;   (smartparens-global-mode 1))
-
-;; ;; automatically enable server-mode
-;; (after! org-roam
-;;   (org-roam-server-open))
+;; Pretty note graphs
+(use-package! org-roam-server
+  ;; Load this pacakge after org-roam is called.
+  :after-call org-roam
+  :config
+  ;; This is to fix a bug with Doom:
+  ;; https://github.com/org-roam/org-roam-server/issues/115
+  (defun org-roam-server-open ()
+    "Ensure the server is active, then open the roam graph."
+    (interactive)
+    (smartparens-global-mode -1)
+    (org-roam-server-mode 1)
+    (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))
+    (smartparens-global-mode 1))
+  (map!
+   (:leader :prefix ("r" . "roam")
+    :desc "Start server for web graph" "G" #'org-roam-server-open)))
 
 
 (use-package! org-roam-bibtex
@@ -334,7 +352,9 @@
   ;; Sane paragraph definition
   (setq-hook! 'LaTeX-mode-hook
     paragraph-start "\f\\|[ 	]*$"
-    paragraph-separate "[ 	\f]*$"))
+    paragraph-separate "[ 	\f]*$")
+  (add-hook! 'TeX-mode-hook #'hl-todo-mode))
+
 
 
 (use-package! cdlatex
