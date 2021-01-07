@@ -11,11 +11,13 @@
 
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
+      darkokai-mode-line-padding 1
+      doom-theme 'darkokai
       ;; doom-theme 'eclipse
       ;; doom-theme 'leuven
       ;; doom-theme 'github
       ;; doom-theme 'doom-opera-light
-      doom-theme 'doom-vibrant
+      ;; doom-theme 'doom-vibrant
       ;; doom-theme 'doom-monokai-pro
       ;; doom-theme 'doom-molokai
       ;; doom-theme 'doom-monokai-classic
@@ -118,7 +120,8 @@
 (use-package! ivy
   :config
   (map! :g "M-y" #'counsel-yank-pop
-        :g "<f13>" #'+ivy/switch-workspace-buffer))
+        ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
+        :g "<f13>" #'ivy-switch-buffer))
 
 
 ;; Sane company defaults
@@ -227,6 +230,8 @@
 
 ;; TODO Create tag command (with ivy support)
 ;; TODO org-roam and org-agenda?
+;; NOTE In doom the variable `+org-roam-open-buffer-on-find-file' controls whether
+;; a backlinks buffer open automatically or not.
 ;; TODO Why does automatic file rename not work on title change?
 ;; BUG duplicate ids everywhere, but I can only find always one id
 ;; For now I've disabled logging of duplicate ids, but that's not a longterm
@@ -235,8 +240,7 @@
   ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   :init
   (setq org-roam-db-gc-threshold most-positive-fixnum
-        org-roam-tag-sources '(prop last-directory)
-        org-roam-buffer-position 'left)
+        org-roam-tag-sources '(prop last-directory))
   ;; Set up templates
   (setq org-roam-capture-templates
         '(("d" "default" plain (function org-roam-capture--get-point)
@@ -417,28 +421,15 @@
         deft-extensions '("org" "md" "text" "txt")
         deft-file-naming-rules '((noslash . "_") (nospace . "_")
                                  (case-fn . downcase))
-        deft-use-filename-as-title t
-        ;; deft-incremental-search nil
-        deft-file-limit 20)
+        deft-file-limit 40)
   :config
   (map! :g "<f15>" #'deft
         (:map deft-mode-map
          :desc "Close Deft buffer" :n "q" #'kill-this-buffer
          :i "C-h" #'deft-filter-decrement
-         :i "C-w" #'deft-filter-decrement-word))
-  :config/el-patch
-  (defun deft-parse-title (file contents)
-    "Parse the given FILE and CONTENTS and determine the title.
-If `deft-use-filename-as-title' is nil, the title is taken to
-be the first non-empty line of the FILE.  Else the base name of the FILE is
-used as title."
-    (el-patch-swap (if deft-use-filename-as-title
-                       (deft-base-filename file)
-                     (let ((begin (string-match "^.+$" contents)))
-                       (if begin
-                           (funcall deft-parse-title-function
-                                    (substring contents begin (match-end 0))))))
-                   (org-roam-db--get-title file))))
+         :i "C-w" #'deft-filter-decrement-word)))
+
+
 
 (use-package! python
   :init
@@ -474,14 +465,14 @@ opening REPL buffer."
     (sp-local-pair "\\[" "\\]")))
 
 
-;; TODO Don't open new windows in new workspace, open in either
-;; a given workspace, or just the last used workspace.
-(when (featurep! :ui workspaces)
-  (map! :gn "<C-tab>" #'+workspace/switch-right
-        :gn "<C-iso-lefttab>" #'+workspace/switch-left
-        :gn "C-S-t" #'+workspace/new
-        :gn "C-S-w" #'+workspace/delete
-        :gn "C-S-r" #'+workspace/re))
+;; ;; TODO Don't open new windows in new workspace, open in either
+;; ;; a given workspace, or just the last used workspace.
+;; (when (featurep! :ui workspaces)
+;;   (map! :gn "<C-tab>" #'+workspace/switch-right
+;;         :gn "<C-iso-lefttab>" #'+workspace/switch-left
+;;         :gn "C-S-t" #'+workspace/new
+;;         :gn "C-S-w" #'+workspace/delete
+;;         :gn "C-S-r" #'+workspace/re))
 
 
 (use-package! super-save
