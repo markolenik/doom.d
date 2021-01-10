@@ -13,6 +13,7 @@
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
       darkokai-mode-line-padding 1
       doom-theme 'darkokai
+      ;; doom-theme 'molokai
       ;; doom-theme 'eclipse
       ;; doom-theme 'leuven
       ;; doom-theme 'github
@@ -29,7 +30,8 @@
 
 (custom-set-faces!
   `(show-paren-match :foreground ,(doom-color 'bg)
-                     :background ,(doom-color 'magenta) :weight bold))
+                     :background ,(doom-color 'magenta) :weight bold)
+  '((font-lock-function-name-face font-lock-keyword-face) :weight bold))
 (scroll-bar-mode 1)
 
 ;; Some common options
@@ -38,9 +40,9 @@
 
 
 ;; Setup some readline keys etc
-(map! :ige "C-h" #'delete-backward-char
-      :ige "C-d" #'delete-forward-char
-      :ige "C-k" #'kill-line
+(map! :ie "C-h" #'backward-delete-char-untabify
+      :ie "C-d" #'backward-delete-char-untabify
+      :ie "C-k" #'kill-line
       :g "C-S-h" #'help-command
       :g "M-u" #'universal-argument)
 
@@ -121,7 +123,9 @@
   :config
   (map! :g "M-y" #'counsel-yank-pop
         ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
-        :g "<f13>" #'ivy-switch-buffer))
+        :g "<f13>" #'ivy-switch-buffer
+  (:map ivy-minibuffer-map
+   "C-h" #'backward-delete-char-untabify)))
 
 
 ;; Sane company defaults
@@ -439,6 +443,7 @@
   (defun mark/jupyter-connect-repl ()
     "Connect to Jupyter Kernel with kernel file suggestion and without
 opening REPL buffer."
+    ;; TODO Choose kernel by modification time (ls -lt) by default
     (interactive)
     (let* ((path (shell-command-to-string "jupyter --runtime-dir"))
            (file-name (nth 0 (split-string path))))

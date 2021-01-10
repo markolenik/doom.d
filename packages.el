@@ -22,5 +22,6 @@
 
 (package! eclipse-theme)
 (package! darkokai-theme)
+(package! molokai-theme)
 (package! leuven-theme)
 (package! github-theme)
