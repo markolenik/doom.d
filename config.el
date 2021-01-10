@@ -244,7 +244,8 @@
   ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   :init
   (setq org-roam-db-gc-threshold most-positive-fixnum
-        org-roam-tag-sources '(prop last-directory))
+        org-roam-tag-sources '(prop last-directory)
+        +org-roam-open-buffer-on-find-file nil)
   ;; Set up templates
   (setq org-roam-capture-templates
         '(("d" "default" plain (function org-roam-capture--get-point)
