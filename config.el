@@ -443,13 +443,25 @@
   (defun mark/jupyter-connect-repl ()
     "Connect to Jupyter Kernel with kernel file suggestion and without
 opening REPL buffer."
-    ;; TODO Choose kernel by modification time (ls -lt) by default
     (interactive)
     (let* ((path (shell-command-to-string "jupyter --runtime-dir"))
            (file-name (nth 0 (split-string path))))
       (jupyter-connect-repl (read-file-name "Connection file: "
                                             (concat file-name "/"))
-      nil t nil nil))))
+                            nil t nil nil)))
+
+  (defun mark/jupyter-connect-repl-most-recent ()
+    "Connect to most recent Jupyter Kernel."
+    (interactive)
+    (let* ((path (shell-command-to-string "jupyter --runtime-dir"))
+           (file-name (nth 0 (split-string path))))
+      (jupyter-connect-repl
+        (nth 0 (mapcar #'car
+                       (sort
+                        (directory-files-and-attributes file-name t ".json$")
+                             #'(lambda (x y) (not (time-less-p (nth 6 x) (nth 6 y)))))))
+        nil t nil nil))))
+
 
 
 ;;(use-package! ranger
