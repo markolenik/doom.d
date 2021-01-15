@@ -41,7 +41,6 @@
 
 ;; Setup some readline keys etc
 (map! :ie "C-h" #'backward-delete-char-untabify
-      :ie "C-d" #'backward-delete-char-untabify
       :ie "C-k" #'kill-line
       :g "C-S-h" #'help-command
       :g "M-u" #'universal-argument)
@@ -67,7 +66,9 @@
 
 (use-package! which-key
   :init
-  (setq which-key-idle-delay 0.3))
+  (setq which-key-idle-delay 0.3)
+  ;; BUG: `which-key' should start automatically, this is a bug
+  (which-key-mode))
 
 
 (use-package! evil
