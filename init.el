@@ -10,8 +10,8 @@
 
 (doom! :input
        :completion
-       ;; +childframe looks more fancy but is slower and buggy
-       (company +tng); the ultimate code completion backend
+       ;; Problem with +tng: Manual insertion of 4 spaces with TAB doesn't work.
+       (company +childframe); the ultimate code completion backend
        (ivy +prescient +icons)
 
        :ui
@@ -27,7 +27,7 @@
        modeline          ; snazzy, Atom-inspired modeline, plus API
        nav-flash         ; blink cursor line after big motions
        ophints           ; highlight the region an operation acts on
-       (popup +all)   ; tame sudden yet inevitable temporary windows
+       (popup +defaults)   ; tame sudden yet inevitable temporary windows
        ligatures       ; ligatures or substitute text with pretty symbols
        ;;tabs              ; a tab bar for Emacs
        ;; neotree           ; a project drawer, like NERDTree for vim
@@ -121,7 +121,7 @@
        ;;(haskell +dante)  ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        ;;idris             ;
-       ;;json              ; At least it ain't XML
+       json              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
        javascript        ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB

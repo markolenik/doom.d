@@ -29,14 +29,18 @@
       display-line-numbers-type nil)
 
 (custom-set-faces!
-  `(show-paren-match :foreground ,(doom-color 'bg)
-                     :background ,(doom-color 'magenta) :weight bold)
   '((font-lock-function-name-face font-lock-keyword-face) :weight bold))
 (scroll-bar-mode 1)
 
 ;; Some common options
 (setq delete-by-moving-to-trash t
-      confirm-kill-emacs nil)
+      confirm-kill-emacs nil
+      windmove-wrap-around t)
+
+;; Make help window bigger
+(set-popup-rules!
+ '(("^\\*[Hh]elp" :size 20 :select t)))
+
 
 
 ;; Setup some readline keys etc
@@ -66,9 +70,7 @@
 
 (use-package! which-key
   :init
-  (setq which-key-idle-delay 0.3)
-  ;; BUG: `which-key' should start automatically, this is a bug
-  (which-key-mode))
+  (setq which-key-idle-delay 0.3))
 
 
 (use-package! evil
@@ -79,6 +81,8 @@
         evil-split-window-below t
         evil-vsplit-window-right t)
   :config
+  ;; Don't use outline evil bindings, since they change default `M-h'
+  (add-to-list '+evil-collection-disabled-list 'outline)
   (map!
    :g "M-o" #'+evil/insert-newline-below
    :g "M-O" #'+evil/insert-newline-above
@@ -172,7 +176,7 @@
         org-log-done nil
         org-adapt-indentation nil
         org-startup-folded 't
-        ;; Setting this to `t' is necessary in order to be able to link to
+
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
         ;; IDs. If no such file is found, Emacs will go through all files
