@@ -499,3 +499,19 @@ opening REPL buffer."
   (setq super-save-auto-save-when-idle t
         super-save-idle-duration 180)
   (super-save-mode 1))
+
+
+;; Overly complicated solution to have `flycheck-mode' not turn on by default,
+;; only when you toggle it with `SPC t f'.
+(use-package! eglot
+  :init
+  ;; NOTE: Not sure if this is the right place to set this variable.
+  (setq flycheck-global-modes nil)
+  :config
+  (when (featurep! :checkers syntax)
+    (after! flycheck
+      ;; I turn off flycheck after it is turned on by `+lsp-eglot-prefer-flycheck-h',
+      ;; which is why the function has to be appended to the hook with `:append'.
+      (add-hook! 'eglot--managed-mode-hook :append
+        (defun mark/turn-off-flycheck ()
+          (flycheck-mode -1))))))
