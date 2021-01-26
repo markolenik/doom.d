@@ -87,9 +87,7 @@
    :g "M-o" #'+evil/insert-newline-below
    :g "M-O" #'+evil/insert-newline-above
    :n "ga" #'evil-switch-to-windows-last-buffer
-   :n "0" #'doom/backward-to-bol-or-indent
-  ;; Free readline bindings
-   :i "C-d" #'delete-char))
+   :n "0" #'doom/backward-to-bol-or-indent))
 
 
 (use-package! evil-snipe
@@ -369,7 +367,10 @@
   (setq-hook! 'LaTeX-mode-hook
     paragraph-start "\f\\|[ 	]*$"
     paragraph-separate "[ 	\f]*$")
-  (add-hook! 'TeX-mode-hook #'hl-todo-mode))
+  (add-hook! 'TeX-mode-hook #'hl-todo-mode)
+  ;; Make latex equations preview bigger on lappy.
+  (when (string-equal system-name "precision")
+    (plist-put org-format-latex-options :scale 3)))
 
 
 
