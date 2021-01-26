@@ -1,7 +1,10 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
 
-(unpin! bibtex-completion helm-bibtex org-roam)
+;; (unpin! bibtex-completion helm-bibtex org-roam)
+;; NOTE: There's some bug with org-roam, pinning for now.
+;; Error (org-roam): Failed to parse aliases for buffer:
+(unpin! bibtex-completion helm-bibtex)
 (disable-packages! evil-nerd-commenter)
 
 ;; Change frame splits
