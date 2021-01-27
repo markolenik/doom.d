@@ -288,7 +288,7 @@
   :config
   (setq org-agenda-files (list (concat org-roam-directory "dailies")))
   (map!
-   :g "C-<f13>" #'org-roam-switch-to-buffer
+   :g "C-<f14>" #'org-roam-switch-to-buffer
    ;; F13 should be RCTL
    :g "<f13>" #'org-roam-find-file-immediate
    :g "<C-f13>" #'org-roam-find-file
