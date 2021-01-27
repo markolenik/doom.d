@@ -129,7 +129,8 @@
   :config
   (map! :g "M-y" #'counsel-yank-pop
         ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
-        :g "<f13>" #'ivy-switch-buffer
+        ;; f14 should be RALT
+        :g "<f14>" #'ivy-switch-buffer
   (:map ivy-minibuffer-map
    "C-h" #'backward-delete-char-untabify)))
 
@@ -288,8 +289,9 @@
   (setq org-agenda-files (list (concat org-roam-directory "dailies")))
   (map!
    :g "C-<f13>" #'org-roam-switch-to-buffer
-   :g "<f14>" #'org-roam-find-file-immediate
-   :g "<C-f14>" #'org-roam-find-file
+   ;; F13 should be RCTL
+   :g "<f13>" #'org-roam-find-file-immediate
+   :g "<C-f13>" #'org-roam-find-file
    :g "<menu>" #'org-roam-insert-immediate
    :g "<C-menu>" #'org-roam-insert
    :g "<f9>" #'org-roam-db-build-cache
