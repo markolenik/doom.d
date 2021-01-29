@@ -12,7 +12,11 @@
 
 (package! evil-commentary)
 (package! visual-fill-column)
-(package! jupyter)
+;; (package! jupyter)
+;; `python-x' add some additional `python-shell' features
+(package! python-x)
+;; `python-cell' adds matlab-like cell
+(package! python-cell)
 (package! org-ref)
 (package! org-roam-bibtex)
 (package! org-roam-server)

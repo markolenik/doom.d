@@ -32,6 +32,9 @@
   '((font-lock-function-name-face font-lock-keyword-face) :weight bold))
 (scroll-bar-mode 1)
 
+;; Change localleader-key
+(setq doom-localleader-key "\\")
+
 ;; Some common options
 (setq delete-by-moving-to-trash t
       confirm-kill-emacs nil
@@ -42,12 +45,17 @@
  '(("^\\*[Hh]elp" :size 20 :select t)))
 
 
+;; Optimise tramp
+(setq tramp-chunksize 2000)
 
 ;; Setup some readline keys etc
 (map! :ie "C-h" #'backward-delete-char-untabify
       :ie "C-k" #'kill-line
       :g "C-S-h" #'help-command
       :g "M-u" #'universal-argument)
+
+(map! :gin "C-RET" nil
+      :gin "<C-return>" nil)
 
 ;; Convenient keys
 (map! :g "s-`" #'other-window
@@ -449,8 +457,13 @@
 
 (use-package! python
   :init
-  (setq jupyter-repl-echo-eval-p nil
-        jupyter-eval-use-overlays t)
+  (setq python-shell-interpreter "ipython3"
+        python-shell-interpreter-args "-i --pylab --simple-prompt"
+        python-shell-completion-native-enable nil)
+  ;; (setq python-shell-interpreter "jupyter"
+  ;;       python-shell-interpreter-args "console --simple-prompt"
+  ;;       python-shell-prompt-detect-failure-warning nil
+  ;;       python-shell-completion-native-enable nil)
   :preface
   (defun mark/jupyter-connect-repl ()
     "Connect to Jupyter Kernel with kernel file suggestion and without
@@ -472,8 +485,96 @@ opening REPL buffer."
                        (sort
                         (directory-files-and-attributes file-name t ".json$")
                              #'(lambda (x y) (not (time-less-p (nth 6 x) (nth 6 y)))))))
-        nil t nil nil))))
+        nil t nil nil)))
 
+  ;; python-shell stuff
+  (defun mark/python-send-var-at-point ()
+    "Send variable under cursor."
+    (interactive)
+    (python-shell-send-string (thing-at-point 'symbol)))
+
+  (defun mark/python-send-line ()
+    (interactive)
+    (python-shell-send-string
+     (buffer-substring (line-beginning-position) (line-end-position))))
+
+  (defun mark/python-send-var-or-region ()
+    (interactive)
+    (if (not (use-region-p))
+        (mark/python-send-var-at-point)
+      (let ((beg (region-beginning))
+            (end (region-end)))
+        (if (> (evil-count-lines beg end) 1)
+            (python-shell-send-region)
+          (python-shell-send-string (buffer-substring beg end)))))
+    (evil-force-normal-state))
+
+
+  (defun mark/python-get-var-call (var fun)
+    "Return string where VAR is called with FUN."
+    (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
+
+  (defun mark/python-call-point-with (fun)
+    "Call ting-at-point with FUN."
+    (let ((var (thing-at-point 'symbol)))
+      (python-shell-send-string (mark/python-get-var-call var fun))))
+
+  (defun mark/python-call-region-with (fun)
+    "Call single line region with FUN."
+    (let ((var (buffer-substring (mark) (point))))
+      (python-shell-send-string (mark/python-get-var-call var fun))))
+
+  (defun mark/python-call-point-or-region-with (fun)
+    "Call selected variable or variable under point with FUN."
+    (if (use-region-p)
+        (mark/python-call-region-with fun)
+      (mark/python-call-point-with fun)))
+
+  (defun mark/python-send-len ()
+    "Send length of var or region under point."
+    (interactive)
+    (mark/python-call-point-or-region-with "len"))
+
+  (defun mark/python-send-max ()
+    "Send length of var under or region point."
+    (interactive)
+    (mark/python-call-point-or-region-with "max"))
+
+  (defun mark/python-send-min ()
+    "Send length of var under or region point."
+    (interactive)
+    (mark/python-call-point-or-region-with "min"))
+
+  (defun mark/python-send-shape ()
+    "Send share of var under point or region. Works only in pylab atm."
+    (interactive)
+    (mark/python-call-point-or-region-with "shape"))
+
+  (defun mark/python-send-type ()
+    "Send type of var under point or region."
+    (interactive)
+    (mark/python-call-point-or-region-with "type"))
+  :config
+  (map!
+   (:map python-mode-map
+    :localleader
+    :n "\\" #'run-python
+    :n "v" #'mark/python-send-var-or-region
+    :n "m" #'mark/python-send-min
+    :n "M" #'mark/python-send-max
+    :n "s" #'mark/python-send-shape
+    :n "y" #'mark/python-send-type)))
+
+
+(use-package! python-cell
+  :hook (python-mode . python-cell-mode)
+  :init
+  (setq python-cell-highlight-cell nil))
+
+
+(use-package! python-x
+  :init
+  (python-x-setup))
 
 
 ;;(use-package! ranger
