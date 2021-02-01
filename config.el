@@ -46,7 +46,8 @@
 
 
 ;; Optimise tramp
-(setq tramp-chunksize 2000)
+(setq tramp-chunksize 2000
+      tramp-copy-size-limit nil)
 
 ;; Setup some readline keys etc
 (map! :ie "C-h" #'backward-delete-char-untabify
