@@ -461,10 +461,9 @@
   (setq python-shell-interpreter "ipython3"
         python-shell-interpreter-args "-i --pylab --simple-prompt"
         python-shell-completion-native-enable nil)
-  ;; (setq python-shell-interpreter "jupyter"
-  ;;       python-shell-interpreter-args "console --simple-prompt"
-  ;;       python-shell-prompt-detect-failure-warning nil
-  ;;       python-shell-completion-native-enable nil)
+  ;; For some reason company triggers a file transfer in tramp and ipython,
+  ;; which makes completion slow.  Have to trigger completion manually for now.
+  (setq-hook! 'inferior-python-mode-hook company-idle-delay nil)
   :preface
   (defun mark/jupyter-connect-repl ()
     "Connect to Jupyter Kernel with kernel file suggestion and without
