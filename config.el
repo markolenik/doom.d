@@ -55,6 +55,9 @@
       :g "C-S-h" #'help-command
       :g "M-u" #'universal-argument)
 
+(map! :map minibuffer-local-map
+      "C-h" #'backward-delete-char)
+
 (map! :gin "C-RET" nil
       :gin "<C-return>" nil)
 
@@ -97,7 +100,10 @@
    :g "M-O" #'+evil/insert-newline-above
    :n "ga" #'evil-switch-to-windows-last-buffer
    :n "0" #'doom/backward-to-bol-or-indent
-   :i "C-d" #'delete-char))
+   :i "C-d" #'delete-char
+   :map evil-ex-completion-map
+   "C-h" #'delete-backward-char
+   "C-d" #'delete-char))
 
 
 (use-package! evil-snipe
