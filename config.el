@@ -49,6 +49,10 @@
 (setq tramp-chunksize 2000
       tramp-copy-size-limit nil)
 
+(after! tramp
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+
+
 ;; Setup some readline keys etc
 (map! :ie "C-h" #'backward-delete-char-untabify
       :ie "C-k" #'kill-line
@@ -569,7 +573,8 @@ opening REPL buffer."
     :n "m" #'mark/python-send-min
     :n "M" #'mark/python-send-max
     :n "s" #'mark/python-send-shape
-    :n "y" #'mark/python-send-type)))
+    :n "y" #'mark/python-send-type
+    :n "l" #'mark/python-send-len)))
 
 
 (use-package! python-cell
