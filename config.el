@@ -468,12 +468,12 @@
 
 (use-package! python
   :init
-  (setq python-shell-interpreter "ipython3"
-        python-shell-interpreter-args "-i --pylab --simple-prompt"
-        python-shell-completion-native-enable nil)
+  (setq jupyter-repl-echo-eval-p nil
+        jupyter-eval-use-overlays t)
+
   ;; For some reason company triggers a file transfer in tramp and ipython,
   ;; which makes completion slow.  Have to trigger completion manually for now.
-  (setq-hook! 'inferior-python-mode-hook company-idle-delay nil)
+  ;; (setq-hook! 'inferior-python-mode-hook company-idle-delay nil)
   :preface
   (defun mark/jupyter-connect-repl ()
     "Connect to Jupyter Kernel with kernel file suggestion and without
@@ -495,86 +495,7 @@ opening REPL buffer."
                        (sort
                         (directory-files-and-attributes file-name t ".json$")
                              #'(lambda (x y) (not (time-less-p (nth 6 x) (nth 6 y)))))))
-        nil t nil nil)))
-
-  ;; python-shell stuff
-  (defun mark/python-send-var-at-point ()
-    "Send variable under cursor."
-    (interactive)
-    (python-shell-send-string (thing-at-point 'symbol)))
-
-  (defun mark/python-send-line ()
-    (interactive)
-    (python-shell-send-string
-     (buffer-substring (line-beginning-position) (line-end-position))))
-
-  (defun mark/python-send-var-or-region ()
-    (interactive)
-    (if (not (use-region-p))
-        (mark/python-send-var-at-point)
-      (let ((beg (region-beginning))
-            (end (region-end)))
-        (if (> (evil-count-lines beg end) 1)
-            (python-shell-send-region)
-          (python-shell-send-string (buffer-substring beg end)))))
-    (evil-force-normal-state))
-
-
-  (defun mark/python-get-var-call (var fun)
-    "Return string where VAR is called with FUN."
-    (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
-
-  (defun mark/python-call-point-with (fun)
-    "Call ting-at-point with FUN."
-    (let ((var (thing-at-point 'symbol)))
-      (python-shell-send-string (mark/python-get-var-call var fun))))
-
-  (defun mark/python-call-region-with (fun)
-    "Call single line region with FUN."
-    (let ((var (buffer-substring (mark) (point))))
-      (python-shell-send-string (mark/python-get-var-call var fun))))
-
-  (defun mark/python-call-point-or-region-with (fun)
-    "Call selected variable or variable under point with FUN."
-    (if (use-region-p)
-        (mark/python-call-region-with fun)
-      (mark/python-call-point-with fun)))
-
-  (defun mark/python-send-len ()
-    "Send length of var or region under point."
-    (interactive)
-    (mark/python-call-point-or-region-with "len"))
-
-  (defun mark/python-send-max ()
-    "Send length of var under or region point."
-    (interactive)
-    (mark/python-call-point-or-region-with "max"))
-
-  (defun mark/python-send-min ()
-    "Send length of var under or region point."
-    (interactive)
-    (mark/python-call-point-or-region-with "min"))
-
-  (defun mark/python-send-shape ()
-    "Send share of var under point or region. Works only in pylab atm."
-    (interactive)
-    (mark/python-call-point-or-region-with "shape"))
-
-  (defun mark/python-send-type ()
-    "Send type of var under point or region."
-    (interactive)
-    (mark/python-call-point-or-region-with "type"))
-  :config
-  (map!
-   (:map python-mode-map
-    :localleader
-    :n "\\" #'run-python
-    :n "v" #'mark/python-send-var-or-region
-    :n "m" #'mark/python-send-min
-    :n "M" #'mark/python-send-max
-    :n "s" #'mark/python-send-shape
-    :n "y" #'mark/python-send-type
-    :n "l" #'mark/python-send-len)))
+        nil t nil nil))))
 
 
 (use-package! python-cell
@@ -622,18 +543,3 @@ opening REPL buffer."
         super-save-idle-duration 180)
   (super-save-mode 1))
 
-
-;; Overly complicated solution to have `flycheck-mode' not turn on by default,
-;; only when you toggle it with `SPC t f'.
-(use-package! eglot
-  :init
-  ;; NOTE: Not sure if this is the right place to set this variable.
-  (setq flycheck-global-modes nil)
-  :config
-  (when (featurep! :checkers syntax)
-    (after! flycheck
-      ;; I turn off flycheck after it is turned on by `+lsp-eglot-prefer-flycheck-h',
-      ;; which is why the function has to be appended to the hook with `:append'.
-      (add-hook! 'eglot--managed-mode-hook :append
-        (defun mark/turn-off-flycheck ()
-          (flycheck-mode -1))))))
