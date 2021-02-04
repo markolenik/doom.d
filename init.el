@@ -83,12 +83,7 @@
        biblio
        ;;gist              ; interacting with github gists
        lookup              ; navigate your code and its documentation
-       (:cond
-        ((string= system-name "precision")
-         (lsp +eglot))
-        ((string= system-name "office")
-         (lsp +peek))
-        )
+       (lsp +eglot)
        ;;macos             ; MacOS-specific commands
        magit             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
@@ -157,12 +152,9 @@
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       (:cond
-        ((string= system-name "precision")
-         (python +lsp))
-        ((string= system-name "office")
-         (python +pyright))
-        )
+       ;; TODO: Once I figure out how to install pyright on server,
+       ;; change this to `+pyright'
+       (python +lsp)
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
