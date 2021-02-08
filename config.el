@@ -332,11 +332,7 @@
     :desc "Org Roam"                      "r" #'org-roam
     :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
     :desc "Jump to index"                 "TAB" #'org-roam-jump-to-index
-    (:prefix ("d" . "by date")
-     :desc "Arbitrary date" "d" #'org-roam-dailies-date
-     :desc "Today"          "t" #'org-roam-dailies-find-today
-     :desc "Tomorrow"       "m" #'org-roam-dailies-tomorrow
-     :desc "Yesterday"      "y" #'org-roam-dailies-yesterday))
+    )
    (:map org-roam-backlinks-mode-map
     :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)))
 
