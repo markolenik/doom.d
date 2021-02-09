@@ -213,7 +213,9 @@
         ;; Otherwise hard to version control attachments.
         org-attach-id-dir ".attach/"
         org-tag-alist '(("QUESTION" . ?q) ; Unanswered question
-                        ("NOTE" . ?n)     ; Turn this heading into a note
+                        ; Turn this heading into a note,
+                        ; or do some other improvement.
+                        ("REFACTOR" ?r)
                         ("IDEA" . ?i)))   ; Some idea
   :config
   (setq org-startup-indented nil)
