@@ -549,3 +549,6 @@ opening REPL buffer."
         super-save-idle-duration 180)
   (super-save-mode 1))
 
+
+;; TODO Add key to `magit-git-push' without without entering magit
+;; (use-package! magit)
