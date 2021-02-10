@@ -149,7 +149,8 @@
             +pandoc
             +capture
             +pretty
-            +org-cliplink) ; organize your plain life in plain text
+            +org-cliplink
+            +jupyter) ; organize your plain life in plain text
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional

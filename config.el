@@ -473,9 +473,6 @@
 
 
 (use-package! python
-  :init
-  (setq jupyter-repl-echo-eval-p nil
-        jupyter-eval-use-overlays t)
 
   ;; For some reason company triggers a file transfer in tramp and ipython,
   ;; which makes completion slow.  Have to trigger completion manually for now.
@@ -504,20 +501,80 @@ opening REPL buffer."
         nil t nil nil))))
 
 
-(use-package! python-cell
-  :hook (python-mode . python-cell-mode)
-  :init
-  (setq python-cell-highlight-cell nil))
+(use-package! code-cells
+  :hook (python-mode . code-cells-mode)
+  :config
+  (map!
+   (:map code-cells-mode-map
+    :g "M-p" #'code-cells-backward-cell
+    :g "M-n" #'code-cells-forward-cell
+    :g "C-c C-SPC" #'cells-mark-cell
+    ;; TODO Can't add description here, maybe because `code-cells-command' a
+    ;; macro?
+    :g "C-c C-w" (code-cells-command #'kill-region :use-region)
+    :g "C-c M-w" (code-cells-command #'kill-ring-save :user-region
+                                     :pulse)
+    ;; TODO A simple `:after' statement would be more elegant, but for some
+    ;; reason `:after jupyter' doesn't seem to work...
+    (:when (featurep! :lang org +jupyter)
+     :g "<C-return>" (code-cells-command #'jupyter-eval-region
+                                         :use-region :pulse))
+    )))
 
 
-(use-package! python-x
-  :init
-  (python-x-setup))
+(when (featurep! :lang org +jupyter)
+  (use-package! jupyter
+    :init
+    ;; NOTE It may make sense to change `jupyter-repl-echo-eval-p' variable
+    ;; in context depending on function that calls it.
+    (setq jupyter-repl-echo-eval-p nil
+          jupyter-eval-use-overlays t)
+    :config
 
+  ;; NOTE: Most of these functions should could be implemented more easily
+  ;; with macros (probably).
+  ;; TODO At the moment the command is printed in REPL as well, change that.
+  (defun mark/jupyter-get-var-call (var fun)
+    "Return string where VAR is called with FUN."
+    (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
 
-;;(use-package! ranger
-;;  :init
-;;  (setq ranger-deer-show-details nil))
+  (defun mark/jupyter-call-point-with (fun)
+    "Call thing-at-point with FUN."
+    (let ((var (thing-at-point 'symbol)))
+      (jupyter-eval-string (mark/jupyter-get-var-call var fun))))
+
+  (defun mark/jupyter-call-region-with (fun)
+    "Call single line region with FUN."
+    (let ((var (buffer-substring (mark) (point))))
+      (jupyter-eval-string (mark/jupyter-get-var-call var fun))))
+
+  (defun mark/jupyter-call-point-or-region-with (fun)
+    "Call selected variable or variable under point with FUN."
+    (if (use-region-p)
+        (mark/juptyer-call-region-with fun)
+      (mark/jupyter-call-point-with fun)))
+
+  (defun mark/jupyter-send-len ()
+    "Send length of var or region under point."
+    (interactive)
+    (mark/jupyter-call-point-or-region-with "len"))
+
+  (defun mark/jupyter-send-max ()
+    "Send length of var under or region point."
+    (interactive)
+    (mark/jupyter-call-point-or-region-with "max"))
+
+  (defun mark/jupyter-send-min ()
+    "Send length of var under or region point."
+    (interactive)
+    (mark/jupyter-call-point-or-region-with "min"))
+
+  (defun mark/jupyter-send-shape ()
+    "Send share of var under point or region. Works only in pylab atm."
+    (interactive)
+    (mark/jupyter-call-point-or-region-with "shape"))
+
+    ))
 
 
 (use-package! git-gutter
