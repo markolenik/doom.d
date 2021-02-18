@@ -318,11 +318,9 @@
   (setq org-agenda-files (list (concat org-roam-directory "dailies")))
   (map!
    :g "C-<f14>" #'org-roam-switch-to-buffer
-   ;; F13 should be RCTL
    :g "<f13>" #'org-roam-find-file-immediate
    :g "<C-f13>" #'org-roam-insert-immediate
-   :g "<f9>" #'org-roam-db-build-cache
-   (:leader :prefix ("r" . "roam")
+   (:prefix "<f9>"
     :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
     :desc "Org Roam Capture"              "c" #'org-roam-capture
     :desc "Find file"                     "f" #'org-roam-find-file
@@ -332,10 +330,10 @@
     :desc "Org Roam"                      "r" #'org-roam
     :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
     :desc "Jump to index"                 "TAB" #'org-roam-jump-to-index
-    )
-   (:map org-roam-backlinks-mode-map
-    :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)))
-
+    (:prefix "d"
+     :desc "Find today"                    "t" #'org-roam-dailies-today))
+  (:map org-roam-backlinks-mode-map
+   :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)))
 
 
 ;; Pretty note graphs
@@ -471,7 +469,6 @@
 
 
 (use-package! python
-
   ;; For some reason company triggers a file transfer in tramp and ipython,
   ;; which makes completion slow.  Have to trigger completion manually for now.
   ;; (setq-hook! 'inferior-python-mode-hook company-idle-delay nil)
