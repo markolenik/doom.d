@@ -13,6 +13,7 @@
 (package! evil-commentary)
 (package! visual-fill-column)
 (package! org-ref)
+;; Jupyter cells for execution
 (package! code-cells)
 (package! org-roam-bibtex)
 (package! org-roam-server)

@@ -12,11 +12,11 @@
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
       darkokai-mode-line-padding 1
-      doom-theme 'darkokai
+      ;; doom-theme 'darkokai
       ;; doom-theme 'molokai
       ;; doom-theme 'eclipse
       ;; doom-theme 'leuven
-      ;; doom-theme 'github
+      doom-theme 'github
       ;; doom-theme 'doom-opera-light
       ;; doom-theme 'doom-vibrant
       ;; doom-theme 'doom-monokai-pro
@@ -320,9 +320,7 @@
    :g "C-<f14>" #'org-roam-switch-to-buffer
    ;; F13 should be RCTL
    :g "<f13>" #'org-roam-find-file-immediate
-   :g "<C-f13>" #'org-roam-find-file
-   :g "<menu>" #'org-roam-insert-immediate
-   :g "<C-menu>" #'org-roam-insert
+   :g "<C-f13>" #'org-roam-insert-immediate
    :g "<f9>" #'org-roam-db-build-cache
    (:leader :prefix ("r" . "roam")
     :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
@@ -398,7 +396,7 @@
   (add-hook! 'TeX-mode-hook #'hl-todo-mode)
   ;; Make latex equations preview bigger on lappy.
   (when (string-equal system-name "precision")
-    (plist-put org-format-latex-options :scale 3)))
+    (plist-put org-format-latex-options :scale 2)))
 
 
 
@@ -527,52 +525,83 @@ opening REPL buffer."
     :init
     ;; NOTE It may make sense to change `jupyter-repl-echo-eval-p' variable
     ;; in context depending on function that calls it.
+    ;; TODO Jupyter should always send output stuff to *jupyter-result*, and
+    ;; never to *jupyter-output*, confusing to have both.
     (setq jupyter-repl-echo-eval-p nil
           jupyter-eval-use-overlays t)
     :config
 
-  ;; NOTE: Most of these functions should could be implemented more easily
-  ;; with macros (probably).
-  ;; TODO At the moment the command is printed in REPL as well, change that.
+    ;; NOTE: Most of these functions should could be implemented more easily
+    ;; with macros (probably).
+    ;; TODO At the moment the command is printed in REPL as well, change that.
+    ;; ... maybe change max-line-num or sth?
+
+  (defun mark/jupyter-send-var-at-point ()
+    "Send variable under cursor."
+    (interactive)
+    (jupyter-eval-string (thing-at-point 'symbol)))
+
+  (defun mark/jupyter-send-var-or-region ()
+    (interactive)
+    (if (not (use-region-p))
+        (mark/jupyter-send-var-at-point)
+      (let ((beg (region-beginning))
+            (end (region-end)))
+        (if (> (evil-count-lines beg end) 1)
+            (jupyter-eval-region)
+          (jupyter-eval-string-command (buffer-substring beg end)))))
+    (evil-force-normal-state))
+
   (defun mark/jupyter-get-var-call (var fun)
     "Return string where VAR is called with FUN."
     (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
 
-  (defun mark/jupyter-call-point-with (fun)
-    "Call thing-at-point with FUN."
-    (let ((var (thing-at-point 'symbol)))
-      (jupyter-eval-string (mark/jupyter-get-var-call var fun))))
+    (defun mark/jupyter-call-point-with (fun)
+      "Call thing-at-point with FUN."
+      (let ((var (thing-at-point 'symbol)))
+        (jupyter-eval-string-command (mark/jupyter-get-var-call var fun))))
 
-  (defun mark/jupyter-call-region-with (fun)
-    "Call single line region with FUN."
-    (let ((var (buffer-substring (mark) (point))))
-      (jupyter-eval-string (mark/jupyter-get-var-call var fun))))
+    (defun mark/jupyter-call-region-with (fun)
+      "Call single line region with FUN."
+      (let ((var (buffer-substring (mark) (point))))
+        (jupyter-eval-string-command (mark/jupyter-get-var-call var fun))))
 
-  (defun mark/jupyter-call-point-or-region-with (fun)
-    "Call selected variable or variable under point with FUN."
-    (if (use-region-p)
-        (mark/juptyer-call-region-with fun)
-      (mark/jupyter-call-point-with fun)))
+    (defun mark/jupyter-call-point-or-region-with (fun)
+      "Call selected variable or variable under point with FUN."
+      (if (use-region-p)
+          (mark/jupyter-call-region-with fun)
+        (mark/jupyter-call-point-with fun)))
 
-  (defun mark/jupyter-send-len ()
-    "Send length of var or region under point."
-    (interactive)
-    (mark/jupyter-call-point-or-region-with "len"))
+    (defun mark/jupyter-send-len ()
+      "Send length of var or region under point."
+      (interactive)
+      (mark/jupyter-call-point-or-region-with "len"))
 
-  (defun mark/jupyter-send-max ()
-    "Send length of var under or region point."
-    (interactive)
-    (mark/jupyter-call-point-or-region-with "max"))
+    (defun mark/jupyter-send-max ()
+      "Send length of var under or region point."
+      (interactive)
+      (mark/jupyter-call-point-or-region-with "max"))
 
-  (defun mark/jupyter-send-min ()
-    "Send length of var under or region point."
-    (interactive)
-    (mark/jupyter-call-point-or-region-with "min"))
+    (defun mark/jupyter-send-min ()
+      "Send length of var under or region point."
+      (interactive)
+      (mark/jupyter-call-point-or-region-with "min"))
 
-  (defun mark/jupyter-send-shape ()
-    "Send share of var under point or region. Works only in pylab atm."
-    (interactive)
-    (mark/jupyter-call-point-or-region-with "shape"))
+    (defun mark/jupyter-send-shape ()
+      "Send share of var under point or region. Works only in pylab atm."
+      (interactive)
+      (mark/jupyter-call-point-or-region-with "shape"))
+
+  (map!
+   (:map python-mode-map
+    :localleader
+    :n "\\" #'jupyter-connect-repl
+    :n "v" #'mark/jupyter-send-var-or-region
+    :n "m" #'mark/jupyter-send-min
+    :n "M" #'mark/jupyter-send-max
+    :n "s" #'mark/jupyter-send-shape
+    :n "y" #'mark/jupyter-send-type
+    :n "l" #'mark/jupyter-send-len))
 
     ))
 
@@ -590,6 +619,25 @@ opening REPL buffer."
     (sp-local-pair "\\[" "\\]")))
 
 
+(use-package! super-save
+  :init
+  (setq super-save-auto-save-when-idle t
+        super-save-idle-duration 180)
+  (super-save-mode 1))
+
+
+;; NOTE: Quickfix to disable flycheck for now.
+;; TODO: Need better solution in future, i.e. toggle flycheck etc.  Atm can't
+;; run flycheck manually either
+(use-package! flycheck
+  :init
+  (setq-hook! 'python-mode-hook flycheck-disabled-checkers '(lsp)))
+
+
+;; TODO Add key to `magit-git-push' without without entering magit
+;; (use-package! magit)
+
+
 ;; ;; TODO Don't open new windows in new workspace, open in either
 ;; ;; a given workspace, or just the last used workspace.
 ;; (when (featurep! :ui workspaces)
@@ -598,14 +646,3 @@ opening REPL buffer."
 ;;         :gn "C-S-t" #'+workspace/new
 ;;         :gn "C-S-w" #'+workspace/delete
 ;;         :gn "C-S-r" #'+workspace/re))
-
-
-(use-package! super-save
-  :init
-  (setq super-save-auto-save-when-idle t
-        super-save-idle-duration 180)
-  (super-save-mode 1))
-
-
-;; TODO Add key to `magit-git-push' without without entering magit
-;; (use-package! magit)
