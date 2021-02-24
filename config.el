@@ -258,7 +258,9 @@
   ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   (setq org-roam-db-gc-threshold most-positive-fixnum
         org-roam-tag-sources '(prop last-directory)
-        +org-roam-open-buffer-on-find-file nil)
+        org-roam-graph-exclude-matcher '("dailies")
+        +org-roam-open-buffer-on-find-file nil
+        )
   ;; Set up templates
   (setq org-roam-capture-templates
         '(("d" "default" plain (function org-roam-capture--get-point)
@@ -286,9 +288,10 @@
            :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n\n"
            :unnarrowed t))
         org-roam-dailies-capture-templates
-        '(("d" "daily" plain #'org-roam-capture--get-point
-           ""
-           :file-name "dailies/%<%Y%m%d>"
+        '(("d" "daily" entry
+           #'org-roam-capture--get-point
+           "%?"
+           :file-name "daily/%<%Y-%m-%d>"
            :head "#+TITLE: %<%A, %d %B %Y>"
            :immediate-finish t)))
   :config
