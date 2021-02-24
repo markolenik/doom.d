@@ -32,13 +32,12 @@
   '((font-lock-function-name-face font-lock-keyword-face) :weight bold))
 (scroll-bar-mode 1)
 
-;; Change localleader-key
-(setq doom-localleader-key "\\")
-
 ;; Some common options
 (setq delete-by-moving-to-trash t
       confirm-kill-emacs nil
       windmove-wrap-around t)
+
+(setq doom-localleader-key "\\")
 
 ;; Make help window bigger
 (set-popup-rules!
@@ -183,21 +182,19 @@
         "t" #'transpose-frame :desc "Transpose frame"))
 
 
-;; TODO Set `org-tags-alist' to have common tags in org-roam
-;; Not sure if setting here best solution though, would be better if
-;; tags would be read from all files, see org-agenda ...
-;; TODO efficient org-agenda?
 (use-package! org
   ;; `org-num-mode' shows nubmered headings
   ;; :hook (org-mode . org-num-mode)
-  :hook (org-mode . org-fragtog-mode)
+  :hook ((org-mode . org-fragtog-mode)
+         (org-mode . +org-pretty-mode))
   :init
   (setq org-log-done 'time
         ;; org-id-link-to-org-use-id t
         org-log-done nil
-        org-adapt-indentation nil
-        org-startup-folded 't
+        ;; org-startup-folded 't
+        org-startup-indented t
 
+        org-pretty-entities-include-sub-superscripts nil
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
         ;; IDs. If no such file is found, Emacs will go through all files
@@ -213,51 +210,39 @@
         ;; Otherwise hard to version control attachments.
         org-attach-id-dir ".attach/"
         org-tag-alist '(("QUESTION" . ?q) ; Unanswered question
-                        ; Turn this heading into a note,
-                        ; or do some other improvement.
+                                        ; Turn this heading into a note,
+                                        ; or do some other improvement.
                         ("REFACTOR" ?r)
                         ("IDEA" . ?i)))   ; Some idea
+  (setq org-list-demote-modify-bullet
+        '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a.")))
   :config
-  (setq org-startup-indented nil)
+  ;; NOTE: Not sure if that's correct.
+  ;; TODO: Double check
+  ;; see https://emacs.stackexchange.com/questions/3397/how-to-replace-an-element-of-an-alist/3402
+  (add-to-list 'org-blank-before-new-entry
+               '(plain-list-item . nil))
   (when (featurep! :lang org +pretty)
     (setq org-superstar-remove-leading-stars t))
   (map! :map org-mode-map
-        :in "M-h" nil)
-
-  ;; See bug with latex previews in org
-  ;; https://github.com/hlissner/emacs-solaire-mode/issues/24
-  (defun +org-update-latex-preview-background-color (&rest _)
-    (setq-default
-     org-format-latex-options
-     (plist-put org-format-latex-options
-                :background
-                (face-attribute (or (cadr (assq 'default face-remapping-alist))
-                                    'default)
-                                :background nil t))))
-  (advice-add #'load-theme :after #'+org-update-latex-preview-background-color)
-
-  ;; Make org headings be normal size
-  (custom-set-faces
-   '(org-level-1 ((t (:inherit outline-1 :height 1.0))))
-   '(org-level-2 ((t (:inherit outline-2 :height 1.0))))
-   '(org-level-3 ((t (:inherit outline-3 :height 1.0))))
-   '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
-   '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
-   )
-  )
+        :ie "C-l" nil))
 
 
 (use-package! evil-org
   :after (evil org)
   :config
   (map! :map evil-org-mode-map
-        ;; Free readline bindings
+        ;; Free readline bindings and co
         :ie "C-h" nil
         :ie "C-d" nil
         :ien "C-S-h" nil
         :i "C-k" nil
         :i "C-j" nil
-        :in "M-h" nil))
+        :i "C-l" nil
+        :in "M-h" nil
+        :in "M-l" nil
+        :ien "C-M-h" #'org-metaleft
+        :ien "C-M-l" #'org-metaright))
 
 
 ;; TODO Don't attach text files when dragndrop.
@@ -268,17 +253,9 @@
         org-download-heading-lvl nil))
 
 
-;; TODO Create tag command (with ivy support)
-;; TODO org-roam and org-agenda?
-;; NOTE In doom the variable `+org-roam-open-buffer-on-find-file' controls whether
-;; a backlinks buffer open automatically or not.
-;; TODO Why does automatic file rename not work on title change?
-;; BUG duplicate ids everywhere, but I can only find always one id
-;; For now I've disabled logging of duplicate ids, but that's not a longterm
-;; solution. Google. I'm sure someone else has encountered this problem.
 (use-package! org-roam
-  ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   :init
+  ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   (setq org-roam-db-gc-threshold most-positive-fixnum
         org-roam-tag-sources '(prop last-directory)
         +org-roam-open-buffer-on-find-file nil)
@@ -315,7 +292,10 @@
            :head "#+TITLE: %<%A, %d %B %Y>"
            :immediate-finish t)))
   :config
-  (setq org-agenda-files (list (concat org-roam-directory "dailies")))
+  (setq
+   ;; I think agenda slows things down...
+   ;; org-agenda-files (list (concat org-roam-directory "dailies"))
+   org-roam-completion-everywhere nil)
   (map!
    :g "C-<f14>" #'org-roam-switch-to-buffer
    :g "<f13>" #'org-roam-find-file-immediate
@@ -330,10 +310,18 @@
     :desc "Org Roam"                      "r" #'org-roam
     :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
     :desc "Jump to index"                 "TAB" #'org-roam-jump-to-index
-    (:prefix "d"
-     :desc "Find today"                    "t" #'org-roam-dailies-today))
-  (:map org-roam-backlinks-mode-map
-   :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)))
+    (:prefix ("d" . "by date")
+     :desc "Find previous note" "b" #'org-roam-dailies-find-previous-note
+     :desc "Find date"          "d" #'org-roam-dailies-find-date
+     :desc "Find next note"     "f" #'org-roam-dailies-find-next-note
+     :desc "Find tomorrow"      "m" #'org-roam-dailies-find-tomorrow
+     :desc "Capture today"      "n" #'org-roam-dailies-capture-today
+     :desc "Find today"         "t" #'org-roam-dailies-find-today
+     :desc "Capture Date"       "v" #'org-roam-dailies-capture-date
+     :desc "Find yesterday"     "y" #'org-roam-dailies-find-yesterday
+     :desc "Find directory"     "." #'org-roam-dailies-find-directory))
+   (:map org-roam-backlinks-mode-map
+    :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)))
 
 
 ;; Pretty note graphs
@@ -391,10 +379,7 @@
   (setq-hook! 'LaTeX-mode-hook
     paragraph-start "\f\\|[ 	]*$"
     paragraph-separate "[ 	\f]*$")
-  (add-hook! 'TeX-mode-hook #'hl-todo-mode)
-  ;; Make latex equations preview bigger on lappy.
-  (when (string-equal system-name "precision")
-    (plist-put org-format-latex-options :scale 2)))
+  (add-hook! 'TeX-mode-hook #'hl-todo-mode))
 
 
 
