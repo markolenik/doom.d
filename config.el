@@ -11,12 +11,15 @@
 
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
-      darkokai-mode-line-padding 1
+      ;; darkokai-mode-line-padding 1
+      doom-theme 'spolsky
       ;; doom-theme 'darkokai
+      ;; doom-theme 'monokai
       ;; doom-theme 'molokai
       ;; doom-theme 'eclipse
       ;; doom-theme 'leuven
-      doom-theme 'github
+      ;; doom-theme 'github
+      ;; doom-theme 'doom-one
       ;; doom-theme 'doom-opera-light
       ;; doom-theme 'doom-vibrant
       ;; doom-theme 'doom-monokai-pro
@@ -214,9 +217,9 @@
                                         ; or do some other improvement.
                         ("REFACTOR" ?r)
                         ("IDEA" . ?i)))   ; Some idea
+  :config
   (setq org-list-demote-modify-bullet
         '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a.")))
-  :config
   ;; NOTE: Not sure if that's correct.
   ;; TODO: Double check
   ;; see https://emacs.stackexchange.com/questions/3397/how-to-replace-an-element-of-an-alist/3402
@@ -293,7 +296,8 @@
            "%?"
            :file-name "daily/%<%Y-%m-%d>"
            :head "#+TITLE: %<%A, %d %B %Y>"
-           :immediate-finish t)))
+           :immediate-finish t))
+        )
   :config
   (setq
    ;; I think agenda slows things down...
@@ -327,23 +331,25 @@
     :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)))
 
 
-;; Pretty note graphs
-(use-package! org-roam-server
-  ;; Load this pacakge after org-roam is called.
-  :after-call org-roam
-  :config
-  ;; This is to fix a bug with Doom:
-  ;; https://github.com/org-roam/org-roam-server/issues/115
-  (defun org-roam-server-open ()
-    "Ensure the server is active, then open the roam graph."
-    (interactive)
-    (smartparens-global-mode -1)
-    (org-roam-server-mode 1)
-    (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))
-    (smartparens-global-mode 1))
-  (map!
-   (:leader :prefix ("r" . "roam")
-    :desc "Start server for web graph" "G" #'org-roam-server-open)))
+;; BUG: Seems to slow down everything, in particular problematic
+;; with dailies.  Not using for now.
+;; ;; Pretty note graphs
+;; (use-package! org-roam-server
+;;   ;; Load this pacakge after org-roam is called.
+;;   :after-call org-roam
+;;   :config
+;;   ;; This is to fix a bug with Doom:
+;;   ;; https://github.com/org-roam/org-roam-server/issues/115
+;;   (defun org-roam-server-open ()
+;;     "Ensure the server is active, then open the roam graph."
+;;     (interactive)
+;;     (smartparens-global-mode -1)
+;;     (org-roam-server-mode 1)
+;;     (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))
+;;     (smartparens-global-mode 1))
+;;   (map!
+;;    (:leader :prefix ("r" . "roam")
+;;     :desc "Start server for web graph" "G" #'org-roam-server-open)))
 
 
 (use-package! org-roam-bibtex

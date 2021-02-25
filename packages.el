@@ -19,13 +19,15 @@
 (package! org-roam-server)
 ;; Toggle org-mode latex fragment on cursor hover
 (package! org-fragtog)
-
 (package! el-patch)
-
 (package! super-save)
+(package! devdocs)
 
+;; Themes
 (package! eclipse-theme)
 (package! darkokai-theme)
 (package! molokai-theme)
+(package! monokai-theme)
+(package! sublime-themes)
 (package! leuven-theme)
 (package! github-theme)
