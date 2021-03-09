@@ -19,9 +19,14 @@
 (package! org-roam-server)
 ;; Toggle org-mode latex fragment on cursor hover
 (package! org-fragtog)
+;; Return makes new bullet point
+(package! org-autolist)
 (package! el-patch)
 (package! super-save)
 (package! devdocs)
+
+;; Don't ask to confirm save for files on smb mounts
+(package! modtime-skip-mode)
 
 ;; Themes
 (package! eclipse-theme)

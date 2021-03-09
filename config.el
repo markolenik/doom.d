@@ -11,9 +11,9 @@
 
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
-      ;; darkokai-mode-line-padding 1
-      doom-theme 'spolsky
-      ;; doom-theme 'darkokai
+      ;; doom-theme 'spolsky
+      doom-theme 'darkokai
+      darkokai-mode-line-padding 1
       ;; doom-theme 'monokai
       ;; doom-theme 'molokai
       ;; doom-theme 'eclipse
@@ -189,14 +189,20 @@
   ;; `org-num-mode' shows nubmered headings
   ;; :hook (org-mode . org-num-mode)
   :hook ((org-mode . org-fragtog-mode)
+         (org-mode . org-autolist-mode)
          (org-mode . +org-pretty-mode))
+  :custom-face
+  (org-level-1 ((t (:inherit outline-1 :height 1.0))))
+  (org-level-2 ((t (:inherit outline-2 :height 1.0))))
+  (org-level-3 ((t (:inherit outline-3 :height 1.0))))
+  (org-level-4 ((t (:inherit outline-4 :height 1.0))))
+  (org-level-5 ((t (:inherit outline-5 :height 1.0))))
   :init
   (setq org-log-done 'time
         ;; org-id-link-to-org-use-id t
         org-log-done nil
         ;; org-startup-folded 't
         org-startup-indented t
-
         org-pretty-entities-include-sub-superscripts nil
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
@@ -219,7 +225,8 @@
                         ("IDEA" . ?i)))   ; Some idea
   :config
   (setq org-list-demote-modify-bullet
-        '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a.")))
+        '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a."))
+        org-indent-indentation-per-level 1)
   ;; NOTE: Not sure if that's correct.
   ;; TODO: Double check
   ;; see https://emacs.stackexchange.com/questions/3397/how-to-replace-an-element-of-an-alist/3402
@@ -228,7 +235,43 @@
   (when (featurep! :lang org +pretty)
     (setq org-superstar-remove-leading-stars t))
   (map! :map org-mode-map
-        :ie "C-l" nil))
+        :ie "C-l" nil)
+
+  ;; (defun org-indent--compute-prefixes ()
+  ;;   "Compute prefix strings for regular text and headlines."
+  ;;   (setq org-indent--heading-line-prefixes
+  ;;         (make-vector org-indent--deepest-level nil))
+  ;;   (setq org-indent--inlinetask-line-prefixes
+  ;;         (make-vector org-indent--deepest-level nil))
+  ;;   (setq org-indent--text-line-prefixes
+  ;;         (make-vector org-indent--deepest-level nil))
+  ;;   (dotimes (n org-indent--deepest-level)
+  ;;     (let ((indentation (if (<= n 1) 0
+  ;;                          (* (1- org-indent-indentation-per-level)
+  ;;                             (1- n)))))
+  ;;       ;; Headlines line prefixes.
+  ;;       (let ((heading-prefix (make-string indentation ?*)))
+  ;;         (aset org-indent--heading-line-prefixes
+  ;;               n
+  ;;               (org-add-props heading-prefix nil 'face 'org-indent))
+  ;;         ;; Inline tasks line prefixes
+  ;;         (aset org-indent--inlinetask-line-prefixes
+  ;;               n
+  ;;               (cond ((<= n 1) "")
+  ;;                     ((bound-and-true-p org-inlinetask-show-first-star)
+  ;;                      (concat org-indent-inlinetask-first-star
+  ;;                              (substring heading-prefix 1)))
+  ;;                     (t (org-add-props heading-prefix nil 'face 'org-indent)))))
+  ;;       ;; Text line prefixes.
+  ;;       (aset org-indent--text-line-prefixes
+  ;;             n
+  ;;             (org-add-props
+  ;;                 (concat (make-string (+ n indentation) ?\s)
+  ;;                         (and (> n 0)
+  ;;                              (char-to-string org-indent-boundary-char)))
+  ;;       	  nil 'face 'org-indent)))))
+
+  )
 
 
 (use-package! evil-org
@@ -315,6 +358,7 @@
     :desc "Insert"                        "i" #'org-roam-insert
     :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
     :desc "Org Roam"                      "r" #'org-roam
+    :desc "Org Roam"                      "<f9>" #'org-roam
     :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
     :desc "Jump to index"                 "TAB" #'org-roam-jump-to-index
     (:prefix ("d" . "by date")
@@ -518,34 +562,35 @@ opening REPL buffer."
     ;; in context depending on function that calls it.
     ;; TODO Jupyter should always send output stuff to *jupyter-result*, and
     ;; never to *jupyter-output*, confusing to have both.
-    (setq jupyter-repl-echo-eval-p nil
-          jupyter-eval-use-overlays t)
+    (setq jupyter-pop-up-frame t
+          jupyter-repl-echo-eval-p nil
+          jupyter-eval-use-overlays t
+          jupyter-eval-short-result-max-lines 0)
     :config
-
     ;; NOTE: Most of these functions should could be implemented more easily
     ;; with macros (probably).
     ;; TODO At the moment the command is printed in REPL as well, change that.
     ;; ... maybe change max-line-num or sth?
 
-  (defun mark/jupyter-send-var-at-point ()
-    "Send variable under cursor."
-    (interactive)
-    (jupyter-eval-string (thing-at-point 'symbol)))
+    (defun mark/jupyter-send-var-at-point ()
+      "Send variable under cursor."
+      (interactive)
+      (jupyter-eval-string (thing-at-point 'symbol)))
 
-  (defun mark/jupyter-send-var-or-region ()
-    (interactive)
-    (if (not (use-region-p))
-        (mark/jupyter-send-var-at-point)
-      (let ((beg (region-beginning))
-            (end (region-end)))
-        (if (> (evil-count-lines beg end) 1)
-            (jupyter-eval-region)
-          (jupyter-eval-string-command (buffer-substring beg end)))))
-    (evil-force-normal-state))
+    (defun mark/jupyter-send-var-or-region ()
+      (interactive)
+      (if (not (use-region-p))
+          (mark/jupyter-send-var-at-point)
+        (let ((beg (region-beginning))
+              (end (region-end)))
+          (if (> (evil-count-lines beg end) 1)
+              (jupyter-eval-region)
+            (jupyter-eval-string-command (buffer-substring beg end)))))
+      (evil-force-normal-state))
 
-  (defun mark/jupyter-get-var-call (var fun)
-    "Return string where VAR is called with FUN."
-    (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
+    (defun mark/jupyter-get-var-call (var fun)
+      "Return string where VAR is called with FUN."
+      (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
 
     (defun mark/jupyter-call-point-with (fun)
       "Call thing-at-point with FUN."
@@ -583,16 +628,16 @@ opening REPL buffer."
       (interactive)
       (mark/jupyter-call-point-or-region-with "shape"))
 
-  (map!
-   (:map python-mode-map
-    :localleader
-    :n "\\" #'jupyter-connect-repl
-    :n "v" #'mark/jupyter-send-var-or-region
-    :n "m" #'mark/jupyter-send-min
-    :n "M" #'mark/jupyter-send-max
-    :n "s" #'mark/jupyter-send-shape
-    :n "y" #'mark/jupyter-send-type
-    :n "l" #'mark/jupyter-send-len))
+    (map!
+     (:map python-mode-map
+      :localleader
+      :n "\\" #'jupyter-connect-repl
+      :n "v" #'mark/jupyter-send-var-or-region
+      :n "m" #'mark/jupyter-send-min
+      :n "M" #'mark/jupyter-send-max
+      :n "s" #'mark/jupyter-send-shape
+      :n "y" #'mark/jupyter-send-type
+      :n "l" #'mark/jupyter-send-len))
 
     ))
 
