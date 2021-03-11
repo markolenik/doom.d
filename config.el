@@ -9,6 +9,8 @@
 
 (setq global-hl-line-modes nil)
 
+(scroll-bar-mode 1)
+
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
       ;; doom-theme 'spolsky
@@ -31,9 +33,6 @@
       ;; doom-theme 'doom-ephemeral
       display-line-numbers-type nil)
 
-(custom-set-faces!
-  '((font-lock-function-name-face font-lock-keyword-face) :weight bold))
-(scroll-bar-mode 1)
 
 ;; Some common options
 (setq delete-by-moving-to-trash t
@@ -52,7 +51,7 @@
       tramp-copy-size-limit nil)
 
 (after! tramp
-(add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 
 ;; Setup some readline keys etc
@@ -202,7 +201,6 @@
         ;; org-id-link-to-org-use-id t
         org-log-done nil
         ;; org-startup-folded 't
-        org-startup-indented t
         org-pretty-entities-include-sub-superscripts nil
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
@@ -222,11 +220,15 @@
                                         ; Turn this heading into a note,
                                         ; or do some other improvement.
                         ("REFACTOR" ?r)
-                        ("IDEA" . ?i)))   ; Some idea
+                        ("IDEA" . ?i))
+        org-edit-src-persistent-message nil
+        org-edit-src-turn-on-auto-save t)
   :config
   (setq org-list-demote-modify-bullet
         '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a."))
-        org-indent-indentation-per-level 1)
+        org-indent-indentation-per-level 1
+        org-src-window-setup 'current-window
+        org-startup-indented nil)
   ;; NOTE: Not sure if that's correct.
   ;; TODO: Double check
   ;; see https://emacs.stackexchange.com/questions/3397/how-to-replace-an-element-of-an-alist/3402
@@ -234,44 +236,14 @@
                '(plain-list-item . nil))
   (when (featurep! :lang org +pretty)
     (setq org-superstar-remove-leading-stars t))
+  (add-hook! 'org-mode-hook
+    (defun adjust-latex-image-scale ()
+      (if (> (length (display-monitor-attributes-list)) 1)
+          (plist-put org-format-latex-options :scale 1.5)
+        (plist-put org-format-latex-options :scale 2.5))
+      ))
   (map! :map org-mode-map
-        :ie "C-l" nil)
-
-  ;; (defun org-indent--compute-prefixes ()
-  ;;   "Compute prefix strings for regular text and headlines."
-  ;;   (setq org-indent--heading-line-prefixes
-  ;;         (make-vector org-indent--deepest-level nil))
-  ;;   (setq org-indent--inlinetask-line-prefixes
-  ;;         (make-vector org-indent--deepest-level nil))
-  ;;   (setq org-indent--text-line-prefixes
-  ;;         (make-vector org-indent--deepest-level nil))
-  ;;   (dotimes (n org-indent--deepest-level)
-  ;;     (let ((indentation (if (<= n 1) 0
-  ;;                          (* (1- org-indent-indentation-per-level)
-  ;;                             (1- n)))))
-  ;;       ;; Headlines line prefixes.
-  ;;       (let ((heading-prefix (make-string indentation ?*)))
-  ;;         (aset org-indent--heading-line-prefixes
-  ;;               n
-  ;;               (org-add-props heading-prefix nil 'face 'org-indent))
-  ;;         ;; Inline tasks line prefixes
-  ;;         (aset org-indent--inlinetask-line-prefixes
-  ;;               n
-  ;;               (cond ((<= n 1) "")
-  ;;                     ((bound-and-true-p org-inlinetask-show-first-star)
-  ;;                      (concat org-indent-inlinetask-first-star
-  ;;                              (substring heading-prefix 1)))
-  ;;                     (t (org-add-props heading-prefix nil 'face 'org-indent)))))
-  ;;       ;; Text line prefixes.
-  ;;       (aset org-indent--text-line-prefixes
-  ;;             n
-  ;;             (org-add-props
-  ;;                 (concat (make-string (+ n indentation) ?\s)
-  ;;                         (and (> n 0)
-  ;;                              (char-to-string org-indent-boundary-char)))
-  ;;       	  nil 'face 'org-indent)))))
-
-  )
+        :ie "C-l" nil))
 
 
 (use-package! evil-org
@@ -657,7 +629,7 @@ opening REPL buffer."
 
 (use-package! super-save
   :init
-  (setq super-save-auto-save-when-idle t
+  (setq super-save-auto-save-when-idle nil
         super-save-idle-duration 180)
   (super-save-mode 1))
 
@@ -682,3 +654,9 @@ opening REPL buffer."
 ;;         :gn "C-S-t" #'+workspace/new
 ;;         :gn "C-S-w" #'+workspace/delete
 ;;         :gn "C-S-r" #'+workspace/re))
+
+;; This is just so that I can work on samba files without these annoyting popups
+(use-package! modtime-skip-mode
+  :hook ((org-mode . modtime-skip-mode)
+         (python-mode . modtime-skip-mode)))
+
