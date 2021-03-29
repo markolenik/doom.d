@@ -45,7 +45,6 @@
 (set-popup-rules!
  '(("^\\*[Hh]elp" :size 20 :select t)))
 
-
 ;; Optimise tramp
 (setq tramp-chunksize 2000
       tramp-copy-size-limit nil)
@@ -609,7 +608,9 @@ opening REPL buffer."
       :n "M" #'mark/jupyter-send-max
       :n "s" #'mark/jupyter-send-shape
       :n "y" #'mark/jupyter-send-type
-      :n "l" #'mark/jupyter-send-len))
+      :n "l" #'mark/jupyter-send-len
+      :n "z" #'jupyter-repl-pop-to-buffer
+      ))
 
     ))
 
@@ -659,4 +660,7 @@ opening REPL buffer."
 (use-package! modtime-skip-mode
   :hook ((org-mode . modtime-skip-mode)
          (python-mode . modtime-skip-mode)))
-
+;; BUG Shit aint switchin off!
+;; Also disable `auto-save-mode', causes hangups with samba
+;; (auto-save-mode -1)
+(setq auto-save-default nil)
