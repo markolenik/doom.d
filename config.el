@@ -12,7 +12,9 @@
 (scroll-bar-mode 1)
 
 ;; Set doom looks
-(setq doom-font (font-spec :family "DejaVu Sans Mono" :size 10.5)
+;; NOTE Might need to adjust font size when using on lappy.  Maybe include
+;; condition to check for resolution...
+(setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)
       ;; doom-theme 'spolsky
       doom-theme 'darkokai
       darkokai-mode-line-padding 1
