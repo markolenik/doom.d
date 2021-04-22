@@ -229,7 +229,7 @@
         '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a."))
         org-indent-indentation-per-level 1
         org-src-window-setup 'current-window
-        org-startup-indented nil)
+        org-startup-indented t)
   ;; NOTE: Not sure if that's correct.
   ;; TODO: Double check
   ;; see https://emacs.stackexchange.com/questions/3397/how-to-replace-an-element-of-an-alist/3402
