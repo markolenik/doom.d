@@ -12,8 +12,6 @@
 (scroll-bar-mode 1)
 
 ;; Set doom looks
-;; NOTE Might need to adjust font size when using on lappy.  Maybe include
-;; condition to check for resolution...
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)
       ;; doom-theme 'spolsky
       doom-theme 'darkokai
@@ -35,6 +33,9 @@
       ;; doom-theme 'doom-ephemeral
       display-line-numbers-type nil)
 
+(if (string-equal (system-name) "office")
+    (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 13))
+  (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)))
 
 ;; Some common options
 (setq delete-by-moving-to-trash t
