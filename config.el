@@ -34,7 +34,7 @@
       display-line-numbers-type nil)
 
 (if (string-equal (system-name) "office")
-    (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 13))
+    (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 14))
   (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)))
 
 ;; Some common options
@@ -472,8 +472,7 @@
                                  (case-fn . downcase))
         deft-file-limit 40)
   :config
-  (map! :g "<f15>" #'deft
-        (:map deft-mode-map
+  (map! (:map deft-mode-map
          :desc "Close Deft buffer" :n "q" #'kill-this-buffer
          :i "C-h" #'deft-filter-decrement
          :i "C-w" #'deft-filter-decrement-word)))
@@ -625,10 +624,19 @@ opening REPL buffer."
 
 
 (use-package! smartparens
+  :preface
+  (defun mark/open-block-org-mode (id action context)
+    (when (eq action 'insert)
+      (newline)
+      (newline)
+      (indent-according-to-mode)
+      (previous-line)
+      (indent-according-to-mode)))
   :config
   (sp-with-modes 'org-mode
     (sp-local-pair "$" "$")
-    (sp-local-pair "\\[" "\\]")))
+    (sp-local-pair "\\[" "\\]"
+                   :post-handlers '(:add mark/open-block-org-mode))))
 
 
 (use-package! super-save
