@@ -471,8 +471,7 @@
                                  (case-fn . downcase))
         deft-file-limit 40)
   :config
-  (map! :g "<f15>" #'deft
-        (:map deft-mode-map
+  (map! (:map deft-mode-map
          :desc "Close Deft buffer" :n "q" #'kill-this-buffer
          :i "C-h" #'deft-filter-decrement
          :i "C-w" #'deft-filter-decrement-word)))
