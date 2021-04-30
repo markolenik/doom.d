@@ -12,8 +12,6 @@
 (scroll-bar-mode 1)
 
 ;; Set doom looks
-;; NOTE Might need to adjust font size when using on lappy.  Maybe include
-;; condition to check for resolution...
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)
       ;; doom-theme 'spolsky
       doom-theme 'darkokai
@@ -35,6 +33,9 @@
       ;; doom-theme 'doom-ephemeral
       display-line-numbers-type nil)
 
+(if (string-equal (system-name) "office")
+    (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 14))
+  (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)))
 
 ;; Some common options
 (setq delete-by-moving-to-trash t
@@ -623,10 +624,19 @@ opening REPL buffer."
 
 
 (use-package! smartparens
+  :preface
+  (defun mark/open-block-org-mode (id action context)
+    (when (eq action 'insert)
+      (newline)
+      (newline)
+      (indent-according-to-mode)
+      (previous-line)
+      (indent-according-to-mode)))
   :config
   (sp-with-modes 'org-mode
     (sp-local-pair "$" "$")
-    (sp-local-pair "\\[" "\\]")))
+    (sp-local-pair "\\[" "\\]"
+                   :post-handlers '(:add mark/open-block-org-mode))))
 
 
 (use-package! super-save
