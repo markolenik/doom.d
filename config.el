@@ -335,6 +335,10 @@
     :desc "Org Roam"                      "<f9>" #'org-roam
     :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
     :desc "Jump to index"                 "TAB" #'org-roam-jump-to-index
+    :desc "Add tag"                       "t" #'org-roam-tag-add
+    :desc "Delete tag"                    "T" #'org-roam-tag-delete
+    :desc "Add alias"                     "a" #'org-roam-alias-add
+    :desc "Delete alias"                  "A" #'org-roam-alias-delete
     (:prefix ("d" . "by date")
      :desc "Find previous note" "b" #'org-roam-dailies-find-previous-note
      :desc "Find date"          "d" #'org-roam-dailies-find-date
