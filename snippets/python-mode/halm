@@ -3,33 +3,36 @@
 # key: halm
 # group: general
 # --
-import matplotlib.pyplot as plt
 import warnings
+
+import matplotlib.pyplot as plt
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-import pickle
 import os
+import pickle
+from os import path
+
 import numpy as np
 import pandas as pd
-from os import path
 import sklearn
-
-from configs.standardPaths import StandardPaths
 from configs.linkDefinitions import getLinksForEloClass
+from configs.standardPaths import StandardPaths
 from dataframes.imageFrame import ImageFrame
 from dbInterface.read import query
-from ELObjects.deployConfig import DeployConfig
-from ELObjects.customer import Customer
 from ELObjects.convnet import Convnet
-from ELObjects.sortingRequestConfig import SortingRequestConfig
-from ELObjects.sortingRequest import SortingRequest
-from ELObjects.sorting import Sorting
-from ELObjects.recipes.recipe import Recipe
-from ELObjects.convnetTraining.convnetTrainingConfig import ConvnetTrainingConfig
-from ELObjects.mapping.eloMapping import EloMapping
 from ELObjects.convnetNetwork import ConvnetNetwork
-from trainingBatchPackage.trainingBatchSet.trainingBatchSet import TrainingBatchSet
+from ELObjects.convnetTraining.convnetTraining import ConvnetTraining
+from ELObjects.convnetTraining.convnetTrainingConfig import ConvnetTrainingConfig
+from ELObjects.customer import Customer
+from ELObjects.deployConfig import DeployConfig
+from ELObjects.mapping.eloMapping import EloMapping
+from ELObjects.recipes.recipe import Recipe
+from ELObjects.sorting import Sorting
+from ELObjects.sortingRequest import SortingRequest
+from ELObjects.sortingRequestConfig import SortingRequestConfig
 from labeling.viewerSortingFile.viewerSortingFile import ViewerSortingFile
-plt.style.use('ggplot')
+from trainingBatchPackage.trainingBatchSet.trainingBatchSet import TrainingBatchSet
 
+plt.style.use('ggplot')
 $0
