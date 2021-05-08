@@ -402,11 +402,23 @@
         TeX-save-query nil             ; Don't ask to save before compile.
         TeX-command-default "LatexMk"
         TeX-engine 'luatex)
+  ;; Don't preview figures
+  (setq preview-default-option-list
+        '("displaymath" "textmath" "sections" "footnotes" "showlabels"))
   ;; Sane paragraph definition
   (setq-hook! 'LaTeX-mode-hook
     paragraph-start "\f\\|[ 	]*$"
     paragraph-separate "[ 	\f]*$")
-  (add-hook! 'TeX-mode-hook #'hl-todo-mode))
+  (add-hook! 'TeX-mode-hook #'hl-todo-mode)
+  (add-hook! 'TeX-mode-hook #'TeX-fold-mode)
+  ;; NOTE tex-fold is to show \textbf as bold etc
+  ;; https://emacs.stackexchange.com/questions/14113/how-to-render-latex-expressions-not-necessarily-formula-inside-buffer
+  ;; TODO Try the same with quotes (``'')!
+  ;; TODO Need to do this in a hook or sth
+  ;; :config
+  ;; (add-to-list 'TeX-fold-macro-spec-list
+  ;;              '("[c]" ("cite" "citep")))
+  )
 
 
 
