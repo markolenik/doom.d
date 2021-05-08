@@ -11,7 +11,7 @@
 (doom! :input
        :completion
        ;; Problem with +tng: Manual insertion of 4 spaces with TAB doesn't work.
-       (company +childframe); the ultimate code completion backend
+       (company +tng); the ultimate code completion backend
        (ivy +prescient +icons)
 
        :ui
