@@ -335,6 +335,10 @@
     :desc "Org Roam"                      "<f9>" #'org-roam
     :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
     :desc "Jump to index"                 "TAB" #'org-roam-jump-to-index
+    :desc "Add tag"                       "t" #'org-roam-tag-add
+    :desc "Delete tag"                    "T" #'org-roam-tag-delete
+    :desc "Add alias"                     "a" #'org-roam-alias-add
+    :desc "Delete alias"                  "A" #'org-roam-alias-delete
     (:prefix ("d" . "by date")
      :desc "Find previous note" "b" #'org-roam-dailies-find-previous-note
      :desc "Find date"          "d" #'org-roam-dailies-find-date
@@ -402,11 +406,23 @@
         TeX-save-query nil             ; Don't ask to save before compile.
         TeX-command-default "LatexMk"
         TeX-engine 'luatex)
+  ;; Don't preview figures
+  (setq preview-default-option-list
+        '("displaymath" "textmath" "sections" "footnotes" "showlabels"))
   ;; Sane paragraph definition
   (setq-hook! 'LaTeX-mode-hook
     paragraph-start "\f\\|[ 	]*$"
     paragraph-separate "[ 	\f]*$")
-  (add-hook! 'TeX-mode-hook #'hl-todo-mode))
+  (add-hook! 'TeX-mode-hook #'hl-todo-mode)
+  (add-hook! 'TeX-mode-hook #'TeX-fold-mode)
+  ;; NOTE tex-fold is to show \textbf as bold etc
+  ;; https://emacs.stackexchange.com/questions/14113/how-to-render-latex-expressions-not-necessarily-formula-inside-buffer
+  ;; TODO Try the same with quotes (``'')!
+  ;; TODO Need to do this in a hook or sth
+  ;; :config
+  ;; (add-to-list 'TeX-fold-macro-spec-list
+  ;;              '("[c]" ("cite" "citep")))
+  )
 
 
 
