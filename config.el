@@ -192,12 +192,12 @@
   :hook ((org-mode . org-fragtog-mode)
          (org-mode . org-autolist-mode)
          (org-mode . +org-pretty-mode))
-  :custom-face
-  (org-level-1 ((t (:inherit outline-1 :height 1.0))))
-  (org-level-2 ((t (:inherit outline-2 :height 1.0))))
-  (org-level-3 ((t (:inherit outline-3 :height 1.0))))
-  (org-level-4 ((t (:inherit outline-4 :height 1.0))))
-  (org-level-5 ((t (:inherit outline-5 :height 1.0))))
+  ;; :custom-face
+  ;; (org-level-1 ((t (:inherit outline-1 :height 1.0))))
+  ;; (org-level-2 ((t (:inherit outline-2 :height 1.0))))
+  ;; (org-level-3 ((t (:inherit outline-3 :height 1.0))))
+  ;; (org-level-4 ((t (:inherit outline-4 :height 1.0))))
+  ;; (org-level-5 ((t (:inherit outline-5 :height 1.0))))
   :init
   (setq org-log-done 'time
         ;; org-id-link-to-org-use-id t
