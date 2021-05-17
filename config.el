@@ -84,6 +84,11 @@
        :g "s-d" #'+evil-window-vsplit-a))
 
 
+;; Bind C-m to RET, see 3b0f23792
+;;(define-key key-translation-map [?\C-m] [return])
+(define-key key-translation-map (kbd "RET") nil)
+
+
 (use-package! el-patch)
 
 
@@ -549,6 +554,7 @@ opening REPL buffer."
     :init
     ;; NOTE It may make sense to change `jupyter-repl-echo-eval-p' variable
     ;; in context depending on function that calls it.
+    ;; But it setting it to t seems bugged atm, need to find out why.
     ;; TODO Jupyter should always send output stuff to *jupyter-result*, and
     ;; never to *jupyter-output*, confusing to have both.
     (setq jupyter-pop-up-frame t
