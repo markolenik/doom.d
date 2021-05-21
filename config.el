@@ -410,7 +410,8 @@
   (setq +latex-viewers '(evince)
         TeX-save-query nil             ; Don't ask to save before compile.
         TeX-command-default "LatexMk"
-        TeX-engine 'luatex)
+        TeX-engine 'luatex
+        TeX-electric-sub-and-superscript nil)
   ;; Don't preview figures
   (setq preview-default-option-list
         '("displaymath" "textmath" "sections" "footnotes" "showlabels"))
