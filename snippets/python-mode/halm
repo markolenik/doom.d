@@ -3,6 +3,9 @@
 # key: halm
 # group: general
 # --
+%load_ext autoreload
+%autoreload 2
+
 import warnings
 
 import matplotlib.pyplot as plt
@@ -31,6 +34,7 @@ from ELObjects.recipes.recipe import Recipe
 from ELObjects.sorting import Sorting
 from ELObjects.sortingRequest import SortingRequest
 from ELObjects.sortingRequestConfig import SortingRequestConfig
+from ELObjects.unet.unetNetwork import UnetNetwork
 from labeling.viewerSortingFile.viewerSortingFile import ViewerSortingFile
 from trainingBatchPackage.trainingBatchSet.trainingBatchSet import TrainingBatchSet
 

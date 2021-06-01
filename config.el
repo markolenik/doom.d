@@ -7,15 +7,12 @@
 ;; (setq ispell-personal-dictionary "~/.aspell.en.pws")
 ;; (ispell-change-dictionary "en")
 
-(setq global-hl-line-modes nil)
-
-(scroll-bar-mode 1)
 
 ;; Set doom looks
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)
       ;; doom-theme 'spolsky
-      doom-theme 'darkokai
-      darkokai-mode-line-padding 1
+      ;; doom-theme 'darkokai
+      ;; darkokai-mode-line-padding 1
       ;; doom-theme 'monokai
       ;; doom-theme 'molokai
       ;; doom-theme 'eclipse
@@ -24,20 +21,23 @@
       ;; doom-theme 'doom-one
       ;; doom-theme 'doom-opera-light
       ;; doom-theme 'doom-vibrant
-      ;; doom-theme 'doom-monokai-pro
+      doom-theme 'doom-monokai-pro
       ;; doom-theme 'doom-molokai
       ;; doom-theme 'doom-monokai-classic
       ;; doom-theme 'doom-monokai-spectrum
       ;; doom-theme 'doom-laserwave
       ;; doom-theme 'doom-city-lights
       ;; doom-theme 'doom-ephemeral
-      display-line-numbers-type nil)
+      )
+
 
 (if (string-equal (system-name) "office")
     (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 14))
   (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)))
 
 ;; Some common options
+(scroll-bar-mode 1)
+(setq display-line-numbers-type nil)
 (setq delete-by-moving-to-trash t
       confirm-kill-emacs nil
       windmove-wrap-around t)
