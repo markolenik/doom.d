@@ -24,6 +24,7 @@
 (package! el-patch)
 (package! super-save)
 (package! devdocs)
+(package! sphinx-doc)
 
 ;; Don't ask to confirm save for files on smb mounts
 (package! modtime-skip-mode)

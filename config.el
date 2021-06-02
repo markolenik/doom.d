@@ -21,9 +21,9 @@
       ;; doom-theme 'doom-one
       ;; doom-theme 'doom-opera-light
       ;; doom-theme 'doom-vibrant
-      doom-theme 'doom-monokai-pro
+      ;; doom-theme 'doom-monokai-pro
       ;; doom-theme 'doom-molokai
-      ;; doom-theme 'doom-monokai-classic
+      doom-theme 'doom-monokai-classic
       ;; doom-theme 'doom-monokai-spectrum
       ;; doom-theme 'doom-laserwave
       ;; doom-theme 'doom-city-lights
@@ -116,12 +116,6 @@
    :map evil-ex-completion-map
    "C-h" #'delete-backward-char
    "C-d" #'delete-char))
-
-
-(use-package! evil-snipe
-  :after evil
-  :init
-  (setq evil-snipe-spillover-scope 'visible))
 
 
 ;; I prefer this over `evil-nerd-commenter'
@@ -698,3 +692,12 @@ opening REPL buffer."
 ;; Also disable `auto-save-mode', causes hangups with samba
 ;; (auto-save-mode -1)
 (setq auto-save-default nil)
+
+
+(use-package! sphinx-doc
+  :hook (python-mode . sphinx-doc-mode))
+
+
+;; I prefer standard s/S behaviour
+(after! evil-snipe
+  (evil-snipe-mode -1))
