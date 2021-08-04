@@ -15,7 +15,7 @@
        (ivy +prescient +icons)
 
        :ui
-       deft              ; notational velocity for Emacs
+       ;;deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
        ;; doom-dashboard    ; a nifty splash screen for Emacs
        ;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
@@ -25,11 +25,11 @@
        hydra
        ;; indent-guides     ; highlighted indent columns
        ;; minimap           ; show a map of the code on the side
-       modeline          ; snazzy, Atom-inspired modeline, plus API
+       (modeline +light)          ; snazzy, Atom-inspired modeline, plus API
        nav-flash         ; blink cursor line after big motions
        ophints           ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
-       ligatures       ; ligatures or substitute text with pretty symbols
+       ;;ligatures       ; ligatures or substitute text with pretty symbols
        ;;tabs              ; a tab bar for Emacs
        ;; neotree           ; a project drawer, like NERDTree for vim
        treemacs          ; a project drawer, like neotree but cooler
@@ -83,7 +83,6 @@
        ;;gist              ; interacting with github gists
        lookup              ; navigate your code and its documentation
        (lsp +peek)
-       ;;macos             ; MacOS-specific commands
        magit             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
@@ -96,6 +95,7 @@
        upload            ; map local to remote projects via ssh/ftp
 
        :os
+       :macos
        ;;tty               ; improve the terminal Emacs experience
 
        :lang
@@ -124,7 +124,7 @@
        json              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
        javascript        ; all(hope(abandon(ye(who(enter(here))))))
-       ;;julia             ; a better, faster MATLAB
+       julia             ; a better, faster MATLAB
        ;;kotlin            ; a better, slicker Java(Script)
        (latex +latexmk
               +cdlatex
@@ -144,7 +144,7 @@
        ;; organize your plain life in plain text;
        (org +gnuplot
             +dragndrop
-            +roam
+            +roam2
             +pandoc
             +capture
             +pretty
@@ -153,6 +153,7 @@
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
        (python +lsp
+               +pyenv
                +pyright)
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs

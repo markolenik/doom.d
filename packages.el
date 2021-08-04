@@ -15,8 +15,11 @@
 (package! org-ref)
 ;; Jupyter cells for execution
 (package! code-cells)
+;;(unpin! org-roam)
 (package! org-roam-bibtex)
-(package! org-roam-server)
+
+;; (package! org-roam-server)
+(package! nroam)
 ;; Toggle org-mode latex fragment on cursor hover
 (package! org-fragtog)
 ;; Return makes new bullet point
@@ -37,3 +40,6 @@
 (package! sublime-themes)
 (package! leuven-theme)
 (package! github-theme)
+
+
+(package! notdeft :recipe (:host github :repo "hasu/notdeft"))

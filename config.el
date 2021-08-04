@@ -5,12 +5,10 @@
       user-mail-address "mark.olenik@gmail.com")
 
 ;; (setq ispell-personal-dictionary "~/.aspell.en.pws")
-;; (ispell-change-dictionary "en")
-
+(ispell-change-dictionary "en_GB" t)
 
 ;; Set doom looks
-(setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)
-      ;; doom-theme 'spolsky
+(setq ;; doom-theme 'spolsky
       ;; doom-theme 'darkokai
       ;; darkokai-mode-line-padding 1
       ;; doom-theme 'monokai
@@ -18,12 +16,12 @@
       ;; doom-theme 'eclipse
       ;; doom-theme 'leuven
       ;; doom-theme 'github
-      ;; doom-theme 'doom-one
+      doom-theme 'doom-one
       ;; doom-theme 'doom-opera-light
       ;; doom-theme 'doom-vibrant
       ;; doom-theme 'doom-monokai-pro
       ;; doom-theme 'doom-molokai
-      doom-theme 'doom-monokai-classic
+      ;; doom-theme 'doom-monokai-classic
       ;; doom-theme 'doom-monokai-spectrum
       ;; doom-theme 'doom-laserwave
       ;; doom-theme 'doom-city-lights
@@ -31,9 +29,16 @@
       )
 
 
-(if (string-equal (system-name) "office")
-    (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 14))
-  (setq doom-font (font-spec :family "DejaVu Sans Mono" :size 12)))
+;; Mac stuff
+;;
+(setq mac-pass-command-to-system t
+      ;; That's my long awaited hyper.
+      mac-right-control-modifier 'hyper)
+;; (map! :g "s-`" #'other-frame
+      ;; :g "s-~" (lambda () (interactive) (other-frame -1)))
+;; This is a hack to enable proper cmd-TAB switching in mac,
+;; the menubar doesn't actually appear this way.
+(menu-bar-mode 1)
 
 ;; Some common options
 (scroll-bar-mode 1)
@@ -44,17 +49,14 @@
 
 (setq doom-localleader-key "\\")
 
+;; Disable evil-snipe for now
+(remove-hook 'doom-first-input-hook #'evil-snipe-mode)
+;; Disable highlight line
+(remove-hook 'doom-first-buffer-hook #'global-hl-line-mode)
+
 ;; Make help window bigger
 (set-popup-rules!
  '(("^\\*[Hh]elp" :size 20 :select t)))
-
-;; Optimise tramp
-(setq tramp-chunksize 2000
-      tramp-copy-size-limit nil)
-
-(after! tramp
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
-
 
 ;; Setup some readline keys etc
 (map! :ie "C-h" #'backward-delete-char-untabify
@@ -69,19 +71,16 @@
       :gin "<C-return>" nil)
 
 ;; Convenient keys
-(map! :g "s-`" #'other-window
-      :g "s-n" #'+default/new-buffer
-      :g "s-N" #'make-frame-command
-      :g "s-h" #'windmove-left
-      :g "s-j" #'windmove-down
-      :g "s-k" #'windmove-up
-      :g "s-l" #'windmove-right
-      :g "s-1" #'doom/window-maximize-vertically
-      :g "s-0" #'delete-window
-      :g "s-a" #'mark-whole-buffer
+(map! :g "s-n" #'make-frame-command
+      :g "H-h" #'windmove-left
+      :g "H-j" #'windmove-down
+      :g "H-k" #'windmove-up
+      :g "H-l" #'windmove-right
+      :g "H-v" #'doom/window-maximize-vertically
+      :g "H-0" #'delete-window
       (:after evil
-       :g "s-s" #'+evil-window-split-a
-       :g "s-d" #'+evil-window-vsplit-a))
+       :g "H-s" #'+evil-window-split-a
+       :g "H-d" #'+evil-window-vsplit-a))
 
 
 ;; Bind C-m to RET, see 3b0f23792
@@ -151,7 +150,7 @@
   (map! :g "M-y" #'counsel-yank-pop
         ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
         ;; f14 should be RALT
-        :g "<f14>" #'ivy-switch-buffer
+        :g "<f18>" #'ivy-switch-buffer
   (:map ivy-minibuffer-map
    "C-h" #'backward-delete-char-untabify)))
 
@@ -186,22 +185,14 @@
 
 
 (use-package! org
-  ;; `org-num-mode' shows nubmered headings
-  ;; :hook (org-mode . org-num-mode)
   :hook ((org-mode . org-fragtog-mode)
          (org-mode . org-autolist-mode)
          (org-mode . +org-pretty-mode))
-  ;; :custom-face
-  ;; (org-level-1 ((t (:inherit outline-1 :height 1.0))))
-  ;; (org-level-2 ((t (:inherit outline-2 :height 1.0))))
-  ;; (org-level-3 ((t (:inherit outline-3 :height 1.0))))
-  ;; (org-level-4 ((t (:inherit outline-4 :height 1.0))))
-  ;; (org-level-5 ((t (:inherit outline-5 :height 1.0))))
   :init
   (setq org-log-done 'time
         ;; org-id-link-to-org-use-id t
         org-log-done nil
-        ;; org-startup-folded 't
+        org-startup-folded 'content
         org-pretty-entities-include-sub-superscripts nil
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
@@ -229,7 +220,7 @@
         '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a."))
         org-indent-indentation-per-level 1
         org-src-window-setup 'current-window
-        org-startup-indented t)
+        org-startup-indented nil)
   ;; NOTE: Not sure if that's correct.
   ;; TODO: Double check
   ;; see https://emacs.stackexchange.com/questions/3397/how-to-replace-an-element-of-an-alist/3402
@@ -237,12 +228,12 @@
                '(plain-list-item . nil))
   (when (featurep! :lang org +pretty)
     (setq org-superstar-remove-leading-stars t))
-  (add-hook! 'org-mode-hook
-    (defun adjust-latex-image-scale ()
-      (if (> (length (display-monitor-attributes-list)) 1)
-          (plist-put org-format-latex-options :scale 1.5)
-        (plist-put org-format-latex-options :scale 2.5))
-      ))
+  ;; (add-hook! 'org-mode-hook
+  ;;   (defun adjust-latex-image-scale ()
+  ;;     (if (> (length (display-monitor-attributes-list)) 1)
+  ;;         (plist-put org-format-latex-options :scale 1.5)
+  ;;       (plist-put org-format-latex-options :scale 2.5))
+  ;;     ))
   (map! :map org-mode-map
         :ie "C-l" nil))
 
@@ -276,80 +267,43 @@
   :init
   ;; `org-roam-directory' is set to "~/org/roam" by doom by default
   (setq org-roam-db-gc-threshold most-positive-fixnum
-        org-roam-tag-sources '(prop last-directory)
-        org-roam-graph-exclude-matcher '("dailies")
-        +org-roam-open-buffer-on-find-file nil
-        )
+        +org-roam-open-buffer-on-find-file nil)
   ;; Set up templates
   (setq org-roam-capture-templates
-        '(("d" "default" plain (function org-roam-capture--get-point)
-           "%?" :file-name "%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n"
-           :unnarrowed t)
-          ("a" "action" plain (function org-roam-capture--get-point)
-           "%?"
-           :file-name "%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_TAGS: \"action\"\n"
-           :unnarrowed t))
-        org-roam-capture-immediate-template
-        '("d" "default" plain (function org-roam-capture--get-point)
-          "%?"
-          :file-name "%<%Y%m%d%H%M%S>-${slug}"
-          :head "#+TITLE: ${title}\n"
-          :unnarrowed t
-          :immediate-finish t)
-        ;; roam-ref protocol: Create new note linked to a website reference.
-        ;; roam-ref is triggered by clicking on a brower bookmarklet.
-        org-roam-capture-ref-templates
-        '(("r" "ref" plain (function org-roam-capture--get-point)
-           "%?"
-           :file-name "web/%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_KEY: ${ref}\n\n"
-           :unnarrowed t))
-        org-roam-dailies-capture-templates
-        '(("d" "daily" entry
-           #'org-roam-capture--get-point
-           "%?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+TITLE: %<%A, %d %B %Y>"
-           :immediate-finish t))
-        )
+        '(("d" "default" plain "%?"
+            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                               "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+            :unnarrowed t)
+          ("i" "default" plain "%?"
+            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                               "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+            :unnarrowed t
+            :immediate-finish t)))
   :config
-  (setq
-   ;; I think agenda slows things down...
-   ;; org-agenda-files (list (concat org-roam-directory "dailies"))
-   org-roam-completion-everywhere nil)
+  (setq org-roam-completion-everywhere nil)
+  ;; Timestamp
+  (setq time-stamp-active t
+        time-stamp-start "#\\+last_modified:[ \t]*"
+        time-stamp-end "$"
+        time-stamp-format "\[%Y-%02m-%02d %3a %02H:%02M\]")
+  (add-hook 'before-save-hook 'time-stamp nil)
+
   (map!
-   :g "C-<f14>" #'org-roam-switch-to-buffer
-   :g "<f13>" #'org-roam-find-file-immediate
-   :g "<C-f13>" #'org-roam-insert-immediate
-   (:prefix "<f9>"
-    :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
-    :desc "Org Roam Capture"              "c" #'org-roam-capture
-    :desc "Find file"                     "f" #'org-roam-find-file
-    :desc "Show graph"                    "g" #'org-roam-graph
-    :desc "Insert"                        "i" #'org-roam-insert
-    :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
-    :desc "Org Roam"                      "r" #'org-roam
-    :desc "Org Roam"                      "<f9>" #'org-roam
-    :desc "Rebuild db cache"              "R" #'org-roam-db-build-cache
-    :desc "Jump to index"                 "TAB" #'org-roam-jump-to-index
-    :desc "Add tag"                       "t" #'org-roam-tag-add
-    :desc "Delete tag"                    "T" #'org-roam-tag-delete
-    :desc "Add alias"                     "a" #'org-roam-alias-add
-    :desc "Delete alias"                  "A" #'org-roam-alias-delete
-    (:prefix ("d" . "by date")
-     :desc "Find previous note" "b" #'org-roam-dailies-find-previous-note
-     :desc "Find date"          "d" #'org-roam-dailies-find-date
-     :desc "Find next note"     "f" #'org-roam-dailies-find-next-note
-     :desc "Find tomorrow"      "m" #'org-roam-dailies-find-tomorrow
-     :desc "Capture today"      "n" #'org-roam-dailies-capture-today
-     :desc "Find today"         "t" #'org-roam-dailies-find-today
-     :desc "Capture Date"       "v" #'org-roam-dailies-capture-date
-     :desc "Find yesterday"     "y" #'org-roam-dailies-find-yesterday
-     :desc "Find directory"     "." #'org-roam-dailies-find-directory))
-   (:map org-roam-backlinks-mode-map
-    :desc "Close backlinks buffer" :n "q" #'org-roam-buffer-deactivate)))
+   :g "<f19>" #'org-roam-node-find
+   :g "<C-f19>" #'org-roam-node-insert
+   (:map org-mode-map
+    :localleader
+    :prefix ("m" . "org-roam")
+    "a" #'org-roam-alias-add
+    "A" #'org-roam-alias-delete
+    "R" #'org-roam-db-build-cache)))
+
+
+;; ;; NOTE: Just testing
+;; (use-package! nroam
+;;   :after org-roam
+;;   :config
+;;   (add-hook 'org-mode-hook #'nroam-setup-maybe))
 
 
 ;; BUG: Seems to slow down everything, in particular problematic
@@ -373,16 +327,16 @@
 ;;     :desc "Start server for web graph" "G" #'org-roam-server-open)))
 
 
-(use-package! org-roam-bibtex
-  :after org-roam
-  :hook (org-roam-mode . org-roam-bibtex-mode)
-  :init
-  (setq orb-templates
-        '(("b" "bib-note" plain #'org-roam-capture--get-point
-           "%?"
-           :file-name "bib/${citekey}"
-           :head "#+TITLE: ${title}\n#+ROAM_ALIAS: \"${=key=}\"\n#+ROAM_KEY: ${ref}\n\n"
-           :unnarrowed t))))
+;; (use-package! org-roam-bibtex
+;;   :after org-roam
+;;   :hook (org-roam-mode . org-roam-bibtex-mode)
+;;   :init
+;;   (setq orb-templates
+;;         '(("b" "bib-note" plain #'org-roam-capture--get-point
+;;            "%?"
+;;            :file-name "bib/${citekey}"
+;;            :head "#+TITLE: ${title}\n#+ROAM_ALIAS: \"${=key=}\"\n#+ROAM_KEY: ${ref}\n\n"
+;;            :unnarrowed t))))
 
 
 (use-package! org-ref
@@ -401,7 +355,8 @@
 
 (use-package! latex
   :init
-  (setq +latex-viewers '(evince)
+  (setq
+   ;;+latex-viewers '(evince)
         TeX-save-query nil             ; Don't ask to save before compile.
         TeX-command-default "LatexMk"
         TeX-engine 'luatex
@@ -470,7 +425,7 @@
         bibtex-completion-pdf-field nil
         bibtex-completion-find-additional-pdfs t
         bibtex-completion-pdf-open-function
-        (lambda (fpath) (call-process "xdg-open" nil 0 nil fpath))
+        (lambda (fpath) (call-process "open" nil 0 nil fpath))
         bibtex-completion-notes-template-multiple-files
         (concat
          "#+TITLE: ${title}\n"
@@ -478,21 +433,31 @@
          "#+ROAM_KEY: cite:${=key=}\n\n")))
 
 
-;; Note tacking and searching
-(use-package! deft
-  :init
-  (setq deft-directory org-directory
-        deft-recursive t
-        deft-extensions '("org" "md" "text" "txt")
-        deft-file-naming-rules '((noslash . "_") (nospace . "_")
-                                 (case-fn . downcase))
-        deft-file-limit 40)
-  :config
-  (map! (:map deft-mode-map
-         :desc "Close Deft buffer" :n "q" #'kill-this-buffer
-         :i "C-h" #'deft-filter-decrement
-         :i "C-w" #'deft-filter-decrement-word)))
+;; ;; Note tacking and searching
+;; (use-package! deft
+;;   :init
+;;   (setq deft-directory org-directory
+;;         deft-recursive t
+;;         deft-extensions '("org" "md" "text" "txt")
+;;         deft-file-naming-rules '((noslash . "_") (nospace . "_")
+;;                                  (case-fn . downcase))
+;;         deft-file-limit 40)
+;;   :config
+;;   (map! (:map deft-mode-map
+;;          :desc "Close Deft buffer" :n "q" #'kill-this-buffer
+;;          :i "C-h" #'deft-filter-decrement
+;;          :i "C-w" #'deft-filter-decrement-word)))
 
+(use-package! notdeft
+  :init
+  (setq notdeft-directories '("~/org/roam")
+        notdeft-allow-org-property-drawers t)
+  :config
+  (setq notdeft-xapian-program "/Users/mark/.emacs.d/.local/straight/repos/notdeft/xapian/notdeft-xapian")
+  (map!
+   (:g "<f17>" #'notdeft
+    (:map notdeft-mode-map
+     :n "q" #'notdeft-quit))))
 
 
 (use-package! python
@@ -696,8 +661,3 @@ opening REPL buffer."
 
 (use-package! sphinx-doc
   :hook (python-mode . sphinx-doc-mode))
-
-
-;; I prefer standard s/S behaviour
-(after! evil-snipe
-  (evil-snipe-mode -1))
