@@ -1,5 +1,6 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
+
 ;; User config
 (setq user-full-name "Mark Olenik"
       user-mail-address "mark.olenik@gmail.com")
@@ -7,38 +8,50 @@
 ;; (setq ispell-personal-dictionary "~/.aspell.en.pws")
 (ispell-change-dictionary "en_GB" t)
 
+
+
 ;; Set doom looks
 (setq ;; doom-theme 'spolsky
-      ;; doom-theme 'darkokai
-      ;; darkokai-mode-line-padding 1
-      ;; doom-theme 'monokai
-      ;; doom-theme 'molokai
-      ;; doom-theme 'eclipse
-      ;; doom-theme 'leuven
-      ;; doom-theme 'github
-      doom-theme 'doom-one
-      ;; doom-theme 'doom-opera-light
-      ;; doom-theme 'doom-vibrant
-      ;; doom-theme 'doom-monokai-pro
-      ;; doom-theme 'doom-molokai
-      ;; doom-theme 'doom-monokai-classic
-      ;; doom-theme 'doom-monokai-spectrum
-      ;; doom-theme 'doom-laserwave
-      ;; doom-theme 'doom-city-lights
-      ;; doom-theme 'doom-ephemeral
-      )
+ ;; doom-theme 'darkokai
+ ;; darkokai-mode-line-padding 1
+ ;; doom-theme 'monokai
+ ;; doom-theme 'molokai
+ doom-theme 'doom-xcode
+ ;; doom-theme 'eclipse
+ ;; doom-theme 'leuven
+ ;; doom-theme 'github
+ ;; doom-theme 'doom-one
+ ;; doom-theme 'doom-opera-light
+ ;; doom-theme 'doom-vibrant
+ ;; doom-theme 'doom-monokai-pro
+ ;; doom-theme 'doom-molokai
+ ;; doom-theme 'doom-monokai-classic
+ ;; doom-theme 'doom-monokai-spectrum
+ ;; doom-theme 'doom-laserwave
+ ;; doom-theme 'doom-city-lights
+ ;; doom-theme 'doom-ephemeral
+ )
 
+(setq! +modeline-height 20)
 
+;; ----------------------------------------------------------
 ;; Mac stuff
 ;;
 (setq mac-pass-command-to-system t
       ;; That's my long awaited hyper.
       mac-right-control-modifier 'hyper)
 ;; (map! :g "s-`" #'other-frame
-      ;; :g "s-~" (lambda () (interactive) (other-frame -1)))
+;; :g "s-~" (lambda () (interactive) (other-frame -1)))
 ;; This is a hack to enable proper cmd-TAB switching in mac,
 ;; the menubar doesn't actually appear this way.
-(menu-bar-mode 1)
+;; (menu-bar-mode -1)
+(map! :gnv "<C-tab>" #'mac-next-tab-or-toggle-tab-bar)
+(defun mark/make-new-frame ()
+  (interactive)
+  (make-frame-command)
+  (mac-move-tab-to-new-frame))
+
+;; ----------------------------------------------------------
 
 ;; Some common options
 (scroll-bar-mode 1)
@@ -53,10 +66,12 @@
 (remove-hook 'doom-first-input-hook #'evil-snipe-mode)
 ;; Disable highlight line
 (remove-hook 'doom-first-buffer-hook #'global-hl-line-mode)
+;; Don't add comments to new line
+(setq +default-want-RET-continue-comments nil)
 
 ;; Make help window bigger
 (set-popup-rules!
- '(("^\\*[Hh]elp" :size 20 :select t)))
+  '(("^\\*[Hh]elp" :size 20 :select t)))
 
 ;; Setup some readline keys etc
 (map! :ie "C-h" #'backward-delete-char-untabify
@@ -72,12 +87,25 @@
 
 ;; Convenient keys
 (map! :g "s-n" #'make-frame-command
+      :g "s-t" #'make-frame-command
+      ;; Delete frame and don't ask to confirm
+      :g "s-w" (lambda () (interactive) (delete-frame nil t))
       :g "H-h" #'windmove-left
       :g "H-j" #'windmove-down
       :g "H-k" #'windmove-up
       :g "H-l" #'windmove-right
-      :g "H-v" #'doom/window-maximize-vertically
+      ;; BUG: Why this no work??!! \('_')/
+      ;; :g "<H-left>" #'windmove-left
+      ;; :g "<H-down>" #'windmove-down
+      ;; :g "<H-up>" #'windmove-up
+      ;; :g "<H-right>" #'windmove-right
+      :g "H-\\" #'doom/window-maximize-vertically
       :g "H-0" #'delete-window
+      :g "s-p" #'counsel-find-file
+      ;; :g "<C-tab>" #'mac-next-tab-or-toggle-tab-bar
+      ;; :g "<C-S-tab>" #'mac-previous-tab-or-toggle-tab-bar
+      ;; :g "s-t" #'mac-PDF-to-string
+      :g "<f19>" #'counsel-find-file
       (:after evil
        :g "H-s" #'+evil-window-split-a
        :g "H-d" #'+evil-window-vsplit-a))
@@ -151,17 +179,20 @@
         ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
         ;; f14 should be RALT
         :g "<f18>" #'ivy-switch-buffer
-  (:map ivy-minibuffer-map
-   "C-h" #'backward-delete-char-untabify)))
+        (:map ivy-minibuffer-map
+         "C-h" #'backward-delete-char-untabify)))
 
 
 ;; Sane company defaults
 (use-package! company
+  :init
+  (setq company-selection-wrap-around t)
   :config
+  ;; TODO wtf is this?
   (set-company-backend! '(text-mode prog-mode)
     'company-files)
   (map!
-    :i "C-l" #'+company/complete
+   :i "C-l" #'+company/complete
    (:map company-active-map
     :g "C-l" #'company-complete-common
     :g "C-h" #'backward-delete-char-untabify
@@ -228,12 +259,9 @@
                '(plain-list-item . nil))
   (when (featurep! :lang org +pretty)
     (setq org-superstar-remove-leading-stars t))
-  ;; (add-hook! 'org-mode-hook
-  ;;   (defun adjust-latex-image-scale ()
-  ;;     (if (> (length (display-monitor-attributes-list)) 1)
-  ;;         (plist-put org-format-latex-options :scale 1.5)
-  ;;       (plist-put org-format-latex-options :scale 2.5))
-  ;;     ))
+  (add-hook! 'org-mode-hook
+    (defun adjust-latex-image-scale ()
+      (plist-put org-format-latex-options :scale 1.4)))
   (map! :map org-mode-map
         :ie "C-l" nil))
 
@@ -271,14 +299,19 @@
   ;; Set up templates
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
-            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                               "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
-            :unnarrowed t)
-          ("i" "default" plain "%?"
-            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                               "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
-            :unnarrowed t
-            :immediate-finish t)))
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+           :unnarrowed t)
+          ("i" "immediate" plain "%?"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+           :unnarrowed t
+           :immediate-finish t)
+          ("f" "fleeting" plain "%?"
+           :if-new (file+head "fleeting/%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+           :unnarrowed t)))
+
   :config
   (setq org-roam-completion-everywhere nil)
   ;; Timestamp
@@ -287,15 +320,16 @@
         time-stamp-end "$"
         time-stamp-format "\[%Y-%02m-%02d %3a %02H:%02M\]")
   (add-hook 'before-save-hook 'time-stamp nil)
-
   (map!
-   :g "<f19>" #'org-roam-node-find
-   :g "<C-f19>" #'org-roam-node-insert
+   :g "<f17>" #'org-roam-node-find
+   :g "<C-f17>" #'org-roam-node-insert
    (:map org-mode-map
     :localleader
     :prefix ("m" . "org-roam")
     "a" #'org-roam-alias-add
     "A" #'org-roam-alias-delete
+    "t" #'org-roam-tag-add
+    "T" #'org-roam-tag-remove
     "R" #'org-roam-db-build-cache)))
 
 
@@ -356,11 +390,9 @@
 (use-package! latex
   :init
   (setq
-   ;;+latex-viewers '(evince)
-        TeX-save-query nil             ; Don't ask to save before compile.
-        TeX-command-default "LatexMk"
-        TeX-engine 'luatex
-        TeX-electric-sub-and-superscript nil)
+   TeX-save-query nil             ; Don't ask to save before compile.
+   TeX-engine 'luatex
+   TeX-electric-sub-and-superscript nil)
   ;; Don't preview figures
   (setq preview-default-option-list
         '("displaymath" "textmath" "sections" "footnotes" "showlabels"))
@@ -383,8 +415,8 @@
 
 (use-package! cdlatex
   :init
-  (setq cdlatex-simplify-sub-super-scripts nil
-        cdlatex-sub-super-scripts-outside-math-mode nil)
+  (setq cdlatex-simplify-sub-super-scripts t
+        cdlatex-sub-super-scripts-outside-math-mode t)
   (setq cdlatex-env-alist
         '(
           ("equation*" "\\begin{equation*}\n?\n\\end{equation*}" nil)
@@ -455,37 +487,8 @@
   :config
   (setq notdeft-xapian-program "/Users/mark/.emacs.d/.local/straight/repos/notdeft/xapian/notdeft-xapian")
   (map!
-   (:g "<f17>" #'notdeft
-    (:map notdeft-mode-map
+   ((:map notdeft-mode-map
      :n "q" #'notdeft-quit))))
-
-
-(use-package! python
-  ;; For some reason company triggers a file transfer in tramp and ipython,
-  ;; which makes completion slow.  Have to trigger completion manually for now.
-  ;; (setq-hook! 'inferior-python-mode-hook company-idle-delay nil)
-  :preface
-  (defun mark/jupyter-connect-repl ()
-    "Connect to Jupyter Kernel with kernel file suggestion and without
-opening REPL buffer."
-    (interactive)
-    (let* ((path (shell-command-to-string "jupyter --runtime-dir"))
-           (file-name (nth 0 (split-string path))))
-      (jupyter-connect-repl (read-file-name "Connection file: "
-                                            (concat file-name "/"))
-                            nil t nil nil)))
-
-  (defun mark/jupyter-connect-repl-most-recent ()
-    "Connect to most recent Jupyter Kernel."
-    (interactive)
-    (let* ((path (shell-command-to-string "jupyter --runtime-dir"))
-           (file-name (nth 0 (split-string path))))
-      (jupyter-connect-repl
-        (nth 0 (mapcar #'car
-                       (sort
-                        (directory-files-and-attributes file-name t ".json$")
-                             #'(lambda (x y) (not (time-less-p (nth 6 x) (nth 6 y)))))))
-        nil t nil nil))))
 
 
 (use-package! code-cells
@@ -518,14 +521,42 @@ opening REPL buffer."
     ;; TODO Jupyter should always send output stuff to *jupyter-result*, and
     ;; never to *jupyter-output*, confusing to have both.
     (setq jupyter-pop-up-frame t
-          jupyter-repl-echo-eval-p nil
+          jupyter-repl-echo-eval-p t
           jupyter-eval-use-overlays t
           jupyter-eval-short-result-max-lines 0)
+    ;; For finding the kernel
+    (setq mark/jupyter-kernel-dir
+          "/sshx:tpmark:/home/mark/.local/share/jupyter/runtime/")
     :config
     ;; NOTE: Most of these functions should could be implemented more easily
     ;; with macros (probably).
     ;; TODO At the moment the command is printed in REPL as well, change that.
     ;; ... maybe change max-line-num or sth?
+
+    (defun mark/jupyter-connect-repl ()
+      "Connect to Jupyter Kernel with kernel file suggestion and without
+opening REPL buffer."
+      (interactive)
+      (let* ((path (shell-command-to-string "jupyter --runtime-dir"))
+             (file-name (nth 0 (split-string path))))
+        (jupyter-connect-repl (read-file-name "Connection file: "
+                                              (concat file-name "/"))
+                              nil t nil nil)))
+
+    (defun mark/jupyter-connect-repl-most-recent ()
+      "Connect to most recent Jupyter Kernel."
+      (interactive)
+      ;; FIXME
+      (let* ((file-name (nth 0 (split-string mark/jupyter-kernel-dir))))
+        (jupyter-connect-repl
+         (nth 0 (mapcar #'car
+                        (sort
+                         (directory-files-and-attributes file-name t ".json$")
+                         #'(lambda (x y) (not (time-less-p (nth 6 x) (nth 6 y)))))))
+         nil t nil nil)
+        ;; Import numpy's shape when connecting.
+        (jupyter-eval-string "from numpy import shape as np_shape")
+        ))
 
     (defun mark/jupyter-send-var-at-point ()
       "Send variable under cursor."
@@ -545,7 +576,7 @@ opening REPL buffer."
 
     (defun mark/jupyter-get-var-call (var fun)
       "Return string where VAR is called with FUN."
-      (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
+      (format "%s(%s)" fun var))
 
     (defun mark/jupyter-call-point-with (fun)
       "Call thing-at-point with FUN."
@@ -581,12 +612,12 @@ opening REPL buffer."
     (defun mark/jupyter-send-shape ()
       "Send share of var under point or region. Works only in pylab atm."
       (interactive)
-      (mark/jupyter-call-point-or-region-with "shape"))
+      (mark/jupyter-call-point-or-region-with "np_shape"))
 
     (map!
      (:map python-mode-map
       :localleader
-      :n "\\" #'jupyter-connect-repl
+      :n "\\" #'mark/jupyter-connect-repl-most-recent
       :n "v" #'mark/jupyter-send-var-or-region
       :n "m" #'mark/jupyter-send-min
       :n "M" #'mark/jupyter-send-max
@@ -631,23 +662,13 @@ opening REPL buffer."
 ;; NOTE: Quickfix to disable flycheck for now.
 ;; TODO: Need better solution in future, i.e. toggle flycheck etc.  Atm can't
 ;; run flycheck manually either
-(use-package! flycheck
-  :init
-  (setq-hook! 'python-mode-hook flycheck-disabled-checkers '(lsp)))
+;; (use-package! flycheck
+;;   :init
+;;   (setq-hook! 'python-mode-hook flycheck-disabled-checkers '(lsp)))
 
 
 ;; TODO Add key to `magit-git-push' without without entering magit
 ;; (use-package! magit)
-
-
-;; ;; TODO Don't open new windows in new workspace, open in either
-;; ;; a given workspace, or just the last used workspace.
-;; (when (featurep! :ui workspaces)
-;;   (map! :gn "<C-tab>" #'+workspace/switch-right
-;;         :gn "<C-iso-lefttab>" #'+workspace/switch-left
-;;         :gn "C-S-t" #'+workspace/new
-;;         :gn "C-S-w" #'+workspace/delete
-;;         :gn "C-S-r" #'+workspace/re))
 
 ;; This is just so that I can work on samba files without these annoyting popups
 (use-package! modtime-skip-mode
@@ -658,6 +679,25 @@ opening REPL buffer."
 ;; (auto-save-mode -1)
 (setq auto-save-default nil)
 
+(when (featurep! :tools debugger +lsp)
+  (use-package! dap-mode
+    :init
+    (setq dap-python-debugger 'debugpy)
+    :config
+    ;; NOTE: Bug with dap + poetry.  This fixes it, but would be good to find a
+    ;; https://www.reddit.com/r/emacs/comments/k5dsar/emacs_ide_for_python_setting_up_the_debugger_with/
+    (defun dap-python--pyenv-executable-find (command)
+      (with-venv (executable-find "python")))
+    ))
 
-(use-package! sphinx-doc
-  :hook (python-mode . sphinx-doc-mode))
+
+;; TODO This is still crap, FIXME
+(when (featurep! :tools lsp)
+  (map!
+   (:map lsp-mode-map
+    :leader
+    :n "cR" #'lsp-ui-peek-find-references)))
+
+(map! :leader
+      (:prefix "t"
+       :desc "Highlight line"  "h" #'hl-line-mode))
