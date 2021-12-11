@@ -11,45 +11,34 @@
 
 
 ;; Set doom looks
-(setq ;; doom-theme 'spolsky
- ;; doom-theme 'darkokai
- ;; darkokai-mode-line-padding 1
- ;; doom-theme 'monokai
- ;; doom-theme 'molokai
- doom-theme 'doom-xcode
- ;; doom-theme 'eclipse
- ;; doom-theme 'leuven
- ;; doom-theme 'github
- ;; doom-theme 'doom-one
- ;; doom-theme 'doom-opera-light
- ;; doom-theme 'doom-vibrant
- ;; doom-theme 'doom-monokai-pro
- ;; doom-theme 'doom-molokai
- ;; doom-theme 'doom-monokai-classic
- ;; doom-theme 'doom-monokai-spectrum
- ;; doom-theme 'doom-laserwave
- ;; doom-theme 'doom-city-lights
- ;; doom-theme 'doom-ephemeral
- )
+;; (setq doom-theme 'doom-monokai-machine)
+;; (setq doom-theme 'doom-xcode)
+(setq doom-theme 'doom-city-lights)
+(setq doom-font (font-spec :family "SF Mono" :size 12
+                           :weight 'normal))
+;; TODO Gets ignored when doom font reloaded
+;;(set-face-background 'hl-line "#2F3239")
 
 (setq! +modeline-height 20)
 
 ;; ----------------------------------------------------------
-;; Mac stuff
+;; Mac stuffs
 ;;
 (setq mac-pass-command-to-system t
       ;; That's my long awaited hyper.
-      mac-right-control-modifier 'hyper)
-;; (map! :g "s-`" #'other-frame
-;; :g "s-~" (lambda () (interactive) (other-frame -1)))
+      mac-right-option-modifier 'hyper)
+(map! :g "s-`" #'other-frame
+      :g "s-~" (lambda () (interactive) (other-frame -1)))
 ;; This is a hack to enable proper cmd-TAB switching in mac,
 ;; the menubar doesn't actually appear this way.
-;; (menu-bar-mode -1)
+(menu-bar-mode -1)
 (map! :gnv "<C-tab>" #'mac-next-tab-or-toggle-tab-bar)
 (defun mark/make-new-frame ()
   (interactive)
   (make-frame-command)
   (mac-move-tab-to-new-frame))
+
+(map! :v "s-x" #'helm-M-x)
 
 ;; ----------------------------------------------------------
 
@@ -89,26 +78,31 @@
 (map! :g "s-n" #'make-frame-command
       :g "s-t" #'make-frame-command
       ;; Delete frame and don't ask to confirm
-      :g "s-w" (lambda () (interactive) (delete-frame nil t))
+      :g "s-W" (lambda () (interactive) (delete-frame nil t))
+      :g "s-w" #'delete-window
       :g "H-h" #'windmove-left
       :g "H-j" #'windmove-down
       :g "H-k" #'windmove-up
       :g "H-l" #'windmove-right
-      ;; BUG: Why this no work??!! \('_')/
-      ;; :g "<H-left>" #'windmove-left
-      ;; :g "<H-down>" #'windmove-down
-      ;; :g "<H-up>" #'windmove-up
-      ;; :g "<H-right>" #'windmove-right
-      :g "H-\\" #'doom/window-maximize-vertically
+      :g "<H-left>" #'windmove-left
+      :g "<H-down>" #'windmove-down
+      :g "<H-up>" #'windmove-up
+      :g "<H-right>" #'windmove-right
+      :g "H-m" #'doom/window-maximize-vertically
       :g "H-0" #'delete-window
       :g "s-p" #'counsel-find-file
       ;; :g "<C-tab>" #'mac-next-tab-or-toggle-tab-bar
       ;; :g "<C-S-tab>" #'mac-previous-tab-or-toggle-tab-bar
       ;; :g "s-t" #'mac-PDF-to-string
-      :g "<f19>" #'counsel-find-file
-      (:after evil
-       :g "H-s" #'+evil-window-split-a
-       :g "H-d" #'+evil-window-vsplit-a))
+      :g "<f17>" #'counsel-find-file
+      :g "<C-f17>" #'counsel-recentf
+      :g "H-d" #'+evil-window-vsplit-a
+      :g "H-s" #'+evil-window-split-a)
+
+
+(map! :leader
+      (:prefix "t"
+       :desc "Highlight line"  "h" #'hl-line-mode))
 
 
 ;; Bind C-m to RET, see 3b0f23792
@@ -152,6 +146,7 @@
   (evil-commentary-mode)
   (map! :g "M-/" #'evil-commentary-line
         :g "C-M-/" #'evil-commentary-yank-line
+        :v "gy" #'evil-commentary-yank-line
         :nv "gc" #'evil-commentary))
 
 
@@ -173,15 +168,29 @@
    ?\< '("<" . ">")))
 
 
-(use-package! ivy
-  :config
-  (map! :g "M-y" #'counsel-yank-pop
-        ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
-        ;; f14 should be RALT
-        :g "<f18>" #'ivy-switch-buffer
-        (:map ivy-minibuffer-map
-         "C-h" #'backward-delete-char-untabify)))
+;; (use-package! ivy
+;;   :config
+;;   (map! :g "M-y" #'counsel-yank-pop
+;;         ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
+;;         ;; f14 should be RALT
+;;         :g "<f18>" #'ivy-switch-buffer
+;;         (:map ivy-minibuffer-map
+;;          "C-h" #'backward-delete-char-untabify)))
 
+(when (featurep! :completion helm)
+  (use-package! helm
+    :init
+    (setq helm-move-to-line-cycle-in-source nil)
+    :config
+    (map! :g "M-y" #'helm-show-kill-ring
+          ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
+          ;; f14 should be RALT
+          :g "<f18>" #'helm-buffers-list
+          :g "<C-f18>" #'helm-projectile-switch-to-buffer
+          (:map helm-map
+           "C-h" #'backward-delete-char-untabify)
+          (:map helm-find-files-map
+           "C-l" #'helm-execute-persistent-action))))
 
 ;; Sane company defaults
 (use-package! company
@@ -223,7 +232,6 @@
   (setq org-log-done 'time
         ;; org-id-link-to-org-use-id t
         org-log-done nil
-        org-startup-folded 'content
         org-pretty-entities-include-sub-superscripts nil
         ;; IDs across different files. If `t', Emacs creates a file, .orgids
         ;; in my case, with lists all the files and their respective heading
@@ -232,6 +240,8 @@
         ;; org-id-track-globally t
         org-hide-emphasis-markers t
         org-startup-with-latex-preview t
+        ;; The perfect indentation setup
+        org-indent-indentation-per-level 0
         ;; Add mathtools to latex packages.
         org-latex-packages-alist '(("" "mathtools" t)
                                    ("" "bm" t)
@@ -249,9 +259,11 @@
   :config
   (setq org-list-demote-modify-bullet
         '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a."))
-        org-indent-indentation-per-level 1
         org-src-window-setup 'current-window
-        org-startup-indented nil)
+        org-indent-indentation-per-level 0
+        org-startup-indented 't
+        org-startup-folded 't
+        )
   ;; NOTE: Not sure if that's correct.
   ;; TODO: Double check
   ;; see https://emacs.stackexchange.com/questions/3397/how-to-replace-an-element-of-an-alist/3402
@@ -300,29 +312,35 @@
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                              "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+                              "#+TITLE: ${title}\n\n")
            :unnarrowed t)
           ("i" "immediate" plain "%?"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                              "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+                              "#+TITLE: ${title}\n\n")
            :unnarrowed t
            :immediate-finish t)
           ("f" "fleeting" plain "%?"
            :if-new (file+head "fleeting/%<%Y%m%d%H%M%S>-${slug}.org"
-                              "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
-           :unnarrowed t)))
+                              "#+TITLE: ${title}\n\n")
+           :unnarrowed t)
+          ("F" "flaschenpost" plain "%?"
+           :if-new (file+head "flaschenpost/%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+TITLE: ${title}\n\n")
+           :unnarrowed t)
+          ))
 
   :config
   (setq org-roam-completion-everywhere nil)
+  ;; No need for timestamp after all
   ;; Timestamp
-  (setq time-stamp-active t
-        time-stamp-start "#\\+last_modified:[ \t]*"
-        time-stamp-end "$"
-        time-stamp-format "\[%Y-%02m-%02d %3a %02H:%02M\]")
-  (add-hook 'before-save-hook 'time-stamp nil)
+  ;; (setq time-stamp-active t
+  ;;       time-stamp-start "#\\+last_modified:[ \t]*"
+  ;;       time-stamp-end "$"
+  ;;       time-stamp-format "\[%Y-%02m-%02d %3a %02H:%02M\]")
+  ;; (add-hook 'before-save-hook 'time-stamp nil)
   (map!
-   :g "<f17>" #'org-roam-node-find
-   :g "<C-f17>" #'org-roam-node-insert
+   :g "<f19>" #'org-roam-node-find
+   :g "<C-f19>" #'org-roam-node-insert
    (:map org-mode-map
     :localleader
     :prefix ("m" . "org-roam")
@@ -330,8 +348,54 @@
     "A" #'org-roam-alias-delete
     "t" #'org-roam-tag-add
     "T" #'org-roam-tag-remove
-    "R" #'org-roam-db-build-cache)))
+    "R" #'org-roam-db-build-cache))
 
+  (defun org-hide-properties ()
+    "Hide all org-mode headline property drawers in buffer. Could be slow if it has a lot of overlays."
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^ *:properties:\n\\( *:.+?:.*\n\\)+ *:end:\n" nil t)
+        (let ((ov_this (make-overlay (match-beginning 0) (match-end 0))))
+          (overlay-put ov_this 'display "")
+          (overlay-put ov_this 'hidden-prop-drawer t))))
+    (put 'org-toggle-properties-hide-state 'state 'hidden))
+
+  (defun org-show-properties ()
+    "Show all org-mode property drawers hidden by org-hide-properties."
+    (interactive)
+    (remove-overlays (point-min) (point-max) 'hidden-prop-drawer t)
+    (put 'org-toggle-properties-hide-state 'state 'shown))
+
+  (defun org-toggle-properties ()
+    "Toggle visibility of property drawers."
+    (interactive)
+    (if (eq (get 'org-toggle-properties-hide-state 'state) 'hidden)
+        (org-show-properties)
+      (org-hide-properties)))
+
+  ;; Redefine this org-roam function to hide properties.
+  ;; I'm sure there's a better solution
+  (defun org-roam-buffer-persistent-redisplay ()
+    "Recompute contents of the persistent `org-roam-buffer'.
+Has no effect when there's no `org-roam-node-at-point'."
+    (when-let ((node (org-roam-node-at-point)))
+      (unless (equal node org-roam-buffer-current-node)
+        (setq org-roam-buffer-current-node node
+              org-roam-buffer-current-directory org-roam-directory)
+        (with-current-buffer (get-buffer-create org-roam-buffer)
+          (org-roam-buffer-render-contents)
+          ;; Hide properties
+          (org-hide-properties)
+          ;; Show only titles of backlinks
+          (magit-section-show-level-2)
+          (add-hook 'kill-buffer-hook #'org-roam-buffer--persistent-cleanup-h nil t)))))
+  )
+
+;; (use-package! org-roam-timestamps
+;;   :after org-roam
+;;   :config (org-roam-timestamps-mode))
 
 ;; ;; NOTE: Just testing
 ;; (use-package! nroam
@@ -360,7 +424,6 @@
 ;;    (:leader :prefix ("r" . "roam")
 ;;     :desc "Start server for web graph" "G" #'org-roam-server-open)))
 
-
 ;; (use-package! org-roam-bibtex
 ;;   :after org-roam
 ;;   :hook (org-roam-mode . org-roam-bibtex-mode)
@@ -377,8 +440,6 @@
   :after (org org-roam)
   :init
   (setq org-ref-notes-directory (concat org-roam-directory "bib/")
-        org-ref-default-bibliography '("~/bib/bibliography.bib")
-        org-ref-pdf-directory "~/bib"
         ;; Why nil here?
         org-ref-show-broken-links nil
         org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
@@ -409,8 +470,11 @@
   ;; :config
   ;; (add-to-list 'TeX-fold-macro-spec-list
   ;;              '("[c]" ("cite" "citep")))
+  :config
+  ;; Use Skim but don't use Skim's reading bar
+  (setq TeX-view-program-list
+        '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %o %b")))
   )
-
 
 
 (use-package! cdlatex
@@ -447,8 +511,8 @@
         "desc" "Reformat"    :n "r" #'bibtex-reformat))
 
 
-(use-package! ivy-bibtex
-  :after (ivy org-roam)
+(use-package! helm-bibtex
+  :after (helm org-roam)
   :defer t
   :init
   (setq bibtex-completion-bibliography "~/bib/bibliography.bib"
@@ -463,7 +527,6 @@
          "#+TITLE: ${title}\n"
          "#+ROAM_ALIAS: \"${=key=}\"\n"
          "#+ROAM_KEY: cite:${=key=}\n\n")))
-
 
 ;; ;; Note tacking and searching
 ;; (use-package! deft
@@ -524,15 +587,11 @@
           jupyter-repl-echo-eval-p t
           jupyter-eval-use-overlays t
           jupyter-eval-short-result-max-lines 0)
-    ;; For finding the kernel
-    (setq mark/jupyter-kernel-dir
-          "/sshx:tpmark:/home/mark/.local/share/jupyter/runtime/")
     :config
     ;; NOTE: Most of these functions should could be implemented more easily
     ;; with macros (probably).
     ;; TODO At the moment the command is printed in REPL as well, change that.
     ;; ... maybe change max-line-num or sth?
-
     (defun mark/jupyter-connect-repl ()
       "Connect to Jupyter Kernel with kernel file suggestion and without
 opening REPL buffer."
@@ -547,16 +606,34 @@ opening REPL buffer."
       "Connect to most recent Jupyter Kernel."
       (interactive)
       ;; FIXME
-      (let* ((file-name (nth 0 (split-string mark/jupyter-kernel-dir))))
+      (let* ((kernel-dir
+              (nth 0 (split-string (shell-command-to-string "jupyter --runtime-dir")))))
         (jupyter-connect-repl
          (nth 0 (mapcar #'car
                         (sort
-                         (directory-files-and-attributes file-name t ".json$")
+                         (directory-files-and-attributes kernel-dir t ".json$")
                          #'(lambda (x y) (not (time-less-p (nth 6 x) (nth 6 y)))))))
          nil t nil nil)
         ;; Import numpy's shape when connecting.
         (jupyter-eval-string "from numpy import shape as np_shape")
         ))
+
+    (defun mark/jupyter-connect-repl-most-recent-remote ()
+      "Connect to most recent Jupyter Kernel."
+      (interactive)
+      ;; FIXME
+      (let* ((kernel-dir
+              (nth 0 (split-string "/sshx:tpmark:/home/mark/.local/share/jupyter/runtime/"))))
+        (jupyter-connect-repl
+         (nth 0 (mapcar #'car
+                        (sort
+                         (directory-files-and-attributes kernel-dir t ".json$")
+                         #'(lambda (x y) (not (time-less-p (nth 6 x) (nth 6 y)))))))
+         nil t nil nil)
+        ;; Import numpy's shape when connecting.
+        (jupyter-eval-string "from numpy import shape as np_shape")
+        ))
+
 
     (defun mark/jupyter-send-var-at-point ()
       "Send variable under cursor."
@@ -614,10 +691,23 @@ opening REPL buffer."
       (interactive)
       (mark/jupyter-call-point-or-region-with "np_shape"))
 
+    (defun mark/jupyter-send-type ()
+      "Send type of var or region under point."
+      (interactive)
+      (mark/jupyter-call-point-or-region-with "type"))
+
+    (defun mark/jupyter-kill-all-repl-buffers ()
+      "Kill all open jupyter repls."
+      (interactive)
+      (let ((repl-name-regex "^\*jupyter-repl.*"))
+        (kill-matching-buffers repl-name-regex nil t)))
+
     (map!
      (:map python-mode-map
       :localleader
-      :n "\\" #'mark/jupyter-connect-repl-most-recent
+      :n "c" #'mark/jupyter-connect-repl-most-recent
+      :n "C" #'mark/jupyter-connect-repl-most-recent-remote
+      :n "a" #'jupyter-repl-associate-buffer
       :n "v" #'mark/jupyter-send-var-or-region
       :n "m" #'mark/jupyter-send-min
       :n "M" #'mark/jupyter-send-max
@@ -625,9 +715,8 @@ opening REPL buffer."
       :n "y" #'mark/jupyter-send-type
       :n "l" #'mark/jupyter-send-len
       :n "z" #'jupyter-repl-pop-to-buffer
-      ))
-
-    ))
+      :n "K" #'mark/jupyter-kill-all-repl-buffers
+      ))))
 
 
 (use-package! git-gutter
@@ -680,6 +769,17 @@ opening REPL buffer."
 (setq auto-save-default nil)
 
 (when (featurep! :tools debugger +lsp)
+  (use-package! lsp-mode
+    :init
+    ;; See https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
+    (setq lsp-ui-doc-show-with-cursor nil
+          lsp-signature-render-documentation nil)
+    :config
+    (map!
+     (:map lsp-mode-map
+      :leader
+      :n "cR" #'lsp-ui-peek-find-references))
+    )
   (use-package! dap-mode
     :init
     (setq dap-python-debugger 'debugpy)
@@ -687,17 +787,52 @@ opening REPL buffer."
     ;; NOTE: Bug with dap + poetry.  This fixes it, but would be good to find a
     ;; https://www.reddit.com/r/emacs/comments/k5dsar/emacs_ide_for_python_setting_up_the_debugger_with/
     (defun dap-python--pyenv-executable-find (command)
-      (with-venv (executable-find "python")))
-    ))
+      (with-venv (executable-find "python")))))
+
+;; https://github.com/beancount/beancount-mode/
+(use-package! beancount-mode
+  :mode ("\\.beancount\\'" . beancount-mode)
+  :init
+  (setq-hook! 'beancount-mode-hook electric-indent-chars nil))
 
 
-;; TODO This is still crap, FIXME
-(when (featurep! :tools lsp)
-  (map!
-   (:map lsp-mode-map
-    :leader
-    :n "cR" #'lsp-ui-peek-find-references)))
+(use-package! yasnippet
+  :config
+  (map! :map (yas-minor-mode-map yas-keymap)
+        :gi "<C-tab>" #'yas-expand
+        :gi "<tab>" nil
+        :gi "TAB" nil
+        :gi "<S-tab>" nil
+        :gi "S-TAB" nil)
+  ;; From https://github.com/hlissner/doom-emacs/blob/1b0e1c2cd312d7778636166f0a1114de145cdc70/modules/config/default/%2Bevil-bindings.el
+  ;; This is to rebind yasnippet expand to C-tab. Smart tab for GUI Emacs is hard-coded in Doom.
+  (map! :i [tab] (cmds! (and (bound-and-true-p company-mode)
+                             (featurep! :completion company +tng))
+                        #'company-indent-or-complete-common)
+        :m [tab] (cmds! (and (featurep! :editor fold)
+                             (save-excursion (end-of-line) (invisible-p (point))))
+                        #'+fold/toggle
+                        (or (doom-lookup-key
+                             [tab]
+                             (list (evil-get-auxiliary-keymap (current-local-map) evil-state)
+                                   (current-local-map)))
+                            (doom-lookup-key
+                             (kbd "TAB")
+                             (list (evil-get-auxiliary-keymap (current-local-map) evil-state)))
+                            (doom-lookup-key (kbd "TAB") (list (current-local-map))))
+                        it
+                        (fboundp 'evil-jump-item)
+                        #'evil-jump-item)))
 
-(map! :leader
-      (:prefix "t"
-       :desc "Highlight line"  "h" #'hl-line-mode))
+
+(use-package! yasnippet-radical-snippets
+  :after yasnippet
+  :config
+  (yasnippet-radical-snippets-initialize))
+
+
+;; (use-package! direnv
+;;  :config
+;;  (direnv-mode))
+
+;;

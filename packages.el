@@ -16,6 +16,10 @@
 (unpin! bibtex-completion helm-bibtex)
 (disable-packages! evil-nerd-commenter)
 
+;; ;; Temporary fix for:
+;; ;; https://github.com/hlissner/doom-emacs/issues/5811
+;; (package! citar)
+
 ;; Change frame splits
 (package! transpose-frame)
 
@@ -23,6 +27,7 @@
 (package! visual-fill-column)
 (package! org-ref)
 (package! org-roam-bibtex)
+;; (package! org-roam-timestamps :recipe (:host github :repo "ThomasFKJorna/org-roam-timestamps"))
 
 ;; (package! org-roam-server)
 (package! nroam)
@@ -34,6 +39,8 @@
 (package! super-save)
 (package! devdocs)
 
+
+
 ;; Don't ask to confirm save for files on smb mounts
 (package! modtime-skip-mode)
 
@@ -42,9 +49,18 @@
 
 ;; Snippets for docstrings (mostly Python)
 (package! yasnippet-radical-snippets
-   :recipe (:host github :repo "Xaldew/yasnippet-radical-snippets"
-            :files (:defaults "snippets" "yasnippet-radical-snippets.el")))
+  :recipe (:host github :repo "Xaldew/yasnippet-radical-snippets"
+           :files (:defaults "snippets" "yasnippet-radical-snippets.el")))
 
 (package! notdeft :recipe (:host github :repo "hasu/notdeft"))
 
-(package! with-venv)
+(package! xcode-theme
+  :recipe (:host github :repo "juniorxxue/xcode-theme"))
+
+(package! beancount-mode
+  :recipe (:host github :repo "beancount/beancount-mode"))
+
+;; (package! with-venv)
+
+;; Direnv
+;; (package! direnv)

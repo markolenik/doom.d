@@ -12,7 +12,8 @@
        :completion
        ;; Problem with +tng: Manual insertion of 4 spaces with TAB doesn't work.
        (company +tng); the ultimate code completion backend
-       (ivy +prescient +icons)
+       ;; (ivy +prescient +icons)
+       (helm +fuzzy + icons)
 
        :ui
        ;;deft              ; notational velocity for Emacs
@@ -82,7 +83,8 @@
        biblio
        ;;gist              ; interacting with github gists
        lookup              ; navigate your code and its documentation
-       (lsp +peek)
+       ;; (lsp +peek)
+       lsp
        magit             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
@@ -118,7 +120,7 @@
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
        ;;(go +lsp)         ; the hipster dialect
-       ;;(haskell +dante)  ; a language that's lazier than I am
+       ;; (haskell +lsp)  ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        ;;idris             ;
        json              ; At least it ain't XML

@@ -1,8 +1,8 @@
 # -*- mode: snippet -*-
 # name: fig
 # key: fig
-# group: general
+# group: python
 # --
 fig, ax = plt.subplots()
 ax.plot(${1:xs}, ${2:ys}$0)
-fig.show()
+fig.savefig(${3:path})

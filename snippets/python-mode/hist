@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: hist
+# key: hist
+# --
+fig, ax = plt.subplots()
+ax.hist(${1:xs}, density=True, bins='auto')
+fig.savefig(${3:path}$0)
