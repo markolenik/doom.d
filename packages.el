@@ -52,7 +52,7 @@
   :recipe (:host github :repo "Xaldew/yasnippet-radical-snippets"
            :files (:defaults "snippets" "yasnippet-radical-snippets.el")))
 
-(package! notdeft :recipe (:host github :repo "hasu/notdeft"))
+;; (package! notdeft :recipe (:host github :repo "hasu/notdeft"))
 
 (package! xcode-theme
   :recipe (:host github :repo "juniorxxue/xcode-theme"))
@@ -60,7 +60,13 @@
 (package! beancount-mode
   :recipe (:host github :repo "beancount/beancount-mode"))
 
+
+(package! xpp-mode
+  :recipe (:host github :repo "markolenik/xpp-mode"))
+
 ;; (package! with-venv)
 
 ;; Direnv
 ;; (package! direnv)
+
+(package! zmq)

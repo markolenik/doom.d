@@ -12,8 +12,8 @@
 
 ;; Set doom looks
 ;; (setq doom-theme 'doom-monokai-machine)
-;; (setq doom-theme 'doom-xcode)
-(setq doom-theme 'doom-city-lights)
+(setq doom-theme 'doom-xcode)
+;; (setq doom-theme 'doom-one)
 (setq doom-font (font-spec :family "SF Mono" :size 12
                            :weight 'normal))
 ;; TODO Gets ignored when doom font reloaded
@@ -24,9 +24,7 @@
 ;; ----------------------------------------------------------
 ;; Mac stuffs
 ;;
-(setq mac-pass-command-to-system t
-      ;; That's my long awaited hyper.
-      mac-right-option-modifier 'hyper)
+(setq mac-right-option-modifier 'hyper)
 (map! :g "s-`" #'other-frame
       :g "s-~" (lambda () (interactive) (other-frame -1)))
 ;; This is a hack to enable proper cmd-TAB switching in mac,
@@ -78,12 +76,13 @@
 (map! :g "s-n" #'make-frame-command
       :g "s-t" #'make-frame-command
       ;; Delete frame and don't ask to confirm
-      :g "s-W" (lambda () (interactive) (delete-frame nil t))
-      :g "s-w" #'delete-window
+      :g "s-w" (lambda () (interactive) (delete-frame nil t))
       :g "H-h" #'windmove-left
       :g "H-j" #'windmove-down
       :g "H-k" #'windmove-up
       :g "H-l" #'windmove-right
+      :g "s-[" #'evil-window-prev
+      :g "s-]" #'evil-window-next
       :g "<H-left>" #'windmove-left
       :g "<H-down>" #'windmove-down
       :g "<H-up>" #'windmove-up
@@ -94,8 +93,6 @@
       ;; :g "<C-tab>" #'mac-next-tab-or-toggle-tab-bar
       ;; :g "<C-S-tab>" #'mac-previous-tab-or-toggle-tab-bar
       ;; :g "s-t" #'mac-PDF-to-string
-      :g "<f17>" #'counsel-find-file
-      :g "<C-f17>" #'counsel-recentf
       :g "H-d" #'+evil-window-vsplit-a
       :g "H-s" #'+evil-window-split-a)
 
@@ -185,8 +182,7 @@
     (map! :g "M-y" #'helm-show-kill-ring
           ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
           ;; f14 should be RALT
-          :g "<f18>" #'helm-buffers-list
-          :g "<C-f18>" #'helm-projectile-switch-to-buffer
+          :g "<f18>" #'projectile-switch-to-buffer
           (:map helm-map
            "C-h" #'backward-delete-char-untabify)
           (:map helm-find-files-map
@@ -472,8 +468,8 @@ Has no effect when there's no `org-roam-node-at-point'."
   ;;              '("[c]" ("cite" "citep")))
   :config
   ;; Use Skim but don't use Skim's reading bar
-  (setq TeX-view-program-list
-        '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %o %b")))
+  ;; (setq TeX-view-program-list
+  ;;       '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %o %b")))
   )
 
 
@@ -528,30 +524,50 @@ Has no effect when there's no `org-roam-node-at-point'."
          "#+ROAM_ALIAS: \"${=key=}\"\n"
          "#+ROAM_KEY: cite:${=key=}\n\n")))
 
-;; ;; Note tacking and searching
-;; (use-package! deft
-;;   :init
-;;   (setq deft-directory org-directory
-;;         deft-recursive t
-;;         deft-extensions '("org" "md" "text" "txt")
-;;         deft-file-naming-rules '((noslash . "_") (nospace . "_")
-;;                                  (case-fn . downcase))
-;;         deft-file-limit 40)
-;;   :config
-;;   (map! (:map deft-mode-map
-;;          :desc "Close Deft buffer" :n "q" #'kill-this-buffer
-;;          :i "C-h" #'deft-filter-decrement
-;;          :i "C-w" #'deft-filter-decrement-word)))
-
-(use-package! notdeft
+;; Note tacking and searching
+(use-package! deft
   :init
-  (setq notdeft-directories '("~/org/roam")
-        notdeft-allow-org-property-drawers t)
+  (setq deft-directory org-directory
+        deft-recursive t
+        deft-extensions '("org" "md" "text" "txt")
+        deft-file-naming-rules '((noslash . "_") (nospace . "_")
+                                 (case-fn . downcase))
+        deft-file-limit 40)
   :config
-  (setq notdeft-xapian-program "/Users/mark/.emacs.d/.local/straight/repos/notdeft/xapian/notdeft-xapian")
-  (map!
-   ((:map notdeft-mode-map
-     :n "q" #'notdeft-quit))))
+  (map! (:map deft-mode-map
+         :desc "Close Deft buffer" :n "q" #'kill-this-buffer
+         :i "C-h" #'deft-filter-decrement
+         :i "C-w" #'deft-filter-decrement-word))
+
+  ;; https://github.com/jrblevin/deft/issues/75
+  (defun mark/deft-parse-title (file contents)
+    "Parse the given FILE and CONTENTS and determine the title.
+  If `deft-use-filename-as-title' is nil, the title is taken to
+  be the first non-empty line of the FILE.  Else the base name of the FILE is
+  used as title."
+    (let ((begin (string-match "^#\\+[tT][iI][tT][lL][eE]: .*$" contents)))
+      (if begin
+          (string-trim (substring contents begin (match-end 0)) "#\\+[tT][iI][tT][lL][eE]: *" "[\n\t ]+")
+        (deft-base-filename file))))
+
+  (advice-add 'deft-parse-title :override #'mark/deft-parse-title)
+  (setq deft-strip-summary-regexp
+        (concat "\\("
+                "[\n\t]" ;; blank
+                "\\|^#\\+[[:alpha:]_]+:.*$" ;; org-mode metadata
+                "\\|^:PROPERTIES:\n\\(.+\n\\)+:END:\n"
+                "\\)"))
+  )
+
+;; (use-package! notdeft
+;;   :init
+;;   (setq notdeft-directories '("~/org/roam")
+;;         notdeft-allow-org-property-drawers t)
+;;   :config
+;;   (setq notdeft-xapian-program "/Users/mark/.emacs.d/.local/straight/repos/notdeft/xapian/notdeft-xapian")
+;;   (map!
+;;    ((:map notdeft-mode-map
+;;      :n "q" #'notdeft-quit))))
 
 
 (use-package! code-cells
@@ -596,7 +612,7 @@ Has no effect when there's no `org-roam-node-at-point'."
       "Connect to Jupyter Kernel with kernel file suggestion and without
 opening REPL buffer."
       (interactive)
-      (let* ((path (shell-command-to-string "jupyter --runtime-dir"))
+      (let* ((path (shell-command-to-string "pwd"))
              (file-name (nth 0 (split-string path))))
         (jupyter-connect-repl (read-file-name "Connection file: "
                                               (concat file-name "/"))
@@ -605,7 +621,7 @@ opening REPL buffer."
     (defun mark/jupyter-connect-repl-most-recent ()
       "Connect to most recent Jupyter Kernel."
       (interactive)
-      ;; FIXME
+      ;; FIXME ???
       (let* ((kernel-dir
               (nth 0 (split-string (shell-command-to-string "jupyter --runtime-dir")))))
         (jupyter-connect-repl
@@ -707,6 +723,7 @@ opening REPL buffer."
       :localleader
       :n "c" #'mark/jupyter-connect-repl-most-recent
       :n "C" #'mark/jupyter-connect-repl-most-recent-remote
+      :n "\\" #'mark/jupyter-connect-repl
       :n "a" #'jupyter-repl-associate-buffer
       :n "v" #'mark/jupyter-send-var-or-region
       :n "m" #'mark/jupyter-send-min
@@ -796,33 +813,33 @@ opening REPL buffer."
   (setq-hook! 'beancount-mode-hook electric-indent-chars nil))
 
 
-(use-package! yasnippet
-  :config
-  (map! :map (yas-minor-mode-map yas-keymap)
-        :gi "<C-tab>" #'yas-expand
-        :gi "<tab>" nil
-        :gi "TAB" nil
-        :gi "<S-tab>" nil
-        :gi "S-TAB" nil)
-  ;; From https://github.com/hlissner/doom-emacs/blob/1b0e1c2cd312d7778636166f0a1114de145cdc70/modules/config/default/%2Bevil-bindings.el
-  ;; This is to rebind yasnippet expand to C-tab. Smart tab for GUI Emacs is hard-coded in Doom.
-  (map! :i [tab] (cmds! (and (bound-and-true-p company-mode)
-                             (featurep! :completion company +tng))
-                        #'company-indent-or-complete-common)
-        :m [tab] (cmds! (and (featurep! :editor fold)
-                             (save-excursion (end-of-line) (invisible-p (point))))
-                        #'+fold/toggle
-                        (or (doom-lookup-key
-                             [tab]
-                             (list (evil-get-auxiliary-keymap (current-local-map) evil-state)
-                                   (current-local-map)))
-                            (doom-lookup-key
-                             (kbd "TAB")
-                             (list (evil-get-auxiliary-keymap (current-local-map) evil-state)))
-                            (doom-lookup-key (kbd "TAB") (list (current-local-map))))
-                        it
-                        (fboundp 'evil-jump-item)
-                        #'evil-jump-item)))
+;; (use-package! yasnippet
+;;   :config
+;;   (map! :map (yas-minor-mode-map yas-keymap)
+;;         :gi "<C-tab>" #'yas-expand
+;;         :gi "<tab>" nil
+;;         :gi "TAB" nil
+;;         :gi "<S-tab>" nil
+;;         :gi "S-TAB" nil)
+;;   ;; From https://github.com/hlissner/doom-emacs/blob/1b0e1c2cd312d7778636166f0a1114de145cdc70/modules/config/default/%2Bevil-bindings.el
+;;   ;; This is to rebind yasnippet expand to C-tab. Smart tab for GUI Emacs is hard-coded in Doom.
+;;   (map! :i [tab] (cmds! (and (bound-and-true-p company-mode)
+;;                              (featurep! :completion company +tng))
+;;                         #'company-indent-or-complete-common)
+;;         :m [tab] (cmds! (and (featurep! :editor fold)
+;;                              (save-excursion (end-of-line) (invisible-p (point))))
+;;                         #'+fold/toggle
+;;                         (or (doom-lookup-key
+;;                              [tab]
+;;                              (list (evil-get-auxiliary-keymap (current-local-map) evil-state)
+;;                                    (current-local-map)))
+;;                             (doom-lookup-key
+;;                              (kbd "TAB")
+;;                              (list (evil-get-auxiliary-keymap (current-local-map) evil-state)))
+;;                             (doom-lookup-key (kbd "TAB") (list (current-local-map))))
+;;                         it
+;;                         (fboundp 'evil-jump-item)
+;;                         #'evil-jump-item)))
 
 
 (use-package! yasnippet-radical-snippets
@@ -830,6 +847,14 @@ opening REPL buffer."
   :config
   (yasnippet-radical-snippets-initialize))
 
+
+(use-package! neotree
+  :init
+  (setq neo-default-system-application "open"))
+
+
+(use-package! xpp-mode
+  :mode ("\\.ode\\'" . xpp-mode))
 
 ;; (use-package! direnv
 ;;  :config
