@@ -69,4 +69,10 @@
 ;; Direnv
 ;; (package! direnv)
 
+
+;; Open finder here
+(package! reveal-in-osx-finder)
+;; Open terminal here
+(package! terminal-here)
+
 (package! zmq)

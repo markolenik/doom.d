@@ -12,7 +12,9 @@
 
 ;; Set doom looks
 ;; (setq doom-theme 'doom-monokai-machine)
-(setq doom-theme 'doom-xcode)
+;; (setq doom-theme 'doom-xcode)
+;; (setq doom-theme 'xcode-dark)
+(setq doom-theme 'doom-monokai-machine)
 ;; (setq doom-theme 'doom-one)
 (setq doom-font (font-spec :family "SF Mono" :size 12
                            :weight 'normal))
@@ -129,6 +131,8 @@
    :g "M-o" #'+evil/insert-newline-below
    :g "M-O" #'+evil/insert-newline-above
    :n "ga" #'evil-switch-to-windows-last-buffer
+   :n "gp" #'evil-prev-buffer
+   :n "gn" #'evil-next-buffer
    :n "0" #'doom/backward-to-bol-or-indent
    :i "C-d" #'delete-char
    :map evil-ex-completion-map
@@ -186,6 +190,8 @@
           (:map helm-map
            "C-h" #'backward-delete-char-untabify)
           (:map helm-find-files-map
+           "C-l" #'helm-execute-persistent-action)
+          (:map helm-read-file-map
            "C-l" #'helm-execute-persistent-action))))
 
 ;; Sane company defaults
@@ -420,16 +426,16 @@ Has no effect when there's no `org-roam-node-at-point'."
 ;;    (:leader :prefix ("r" . "roam")
 ;;     :desc "Start server for web graph" "G" #'org-roam-server-open)))
 
-;; (use-package! org-roam-bibtex
-;;   :after org-roam
-;;   :hook (org-roam-mode . org-roam-bibtex-mode)
-;;   :init
-;;   (setq orb-templates
-;;         '(("b" "bib-note" plain #'org-roam-capture--get-point
-;;            "%?"
-;;            :file-name "bib/${citekey}"
-;;            :head "#+TITLE: ${title}\n#+ROAM_ALIAS: \"${=key=}\"\n#+ROAM_KEY: ${ref}\n\n"
-;;            :unnarrowed t))))
+(use-package! org-roam-bibtex
+  :after org-roam
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :init
+  (setq orb-templates
+        '(("b" "bib-note" plain #'org-roam-capture--get-point
+           "%?"
+           :file-name "bib/${citekey}"
+           :head "#+TITLE: ${title}\n#+ROAM_ALIAS: \"${=key=}\"\n#+ROAM_KEY: ${ref}\n\n"
+           :unnarrowed t))))
 
 
 (use-package! org-ref
@@ -850,11 +856,23 @@ opening REPL buffer."
 
 (use-package! neotree
   :init
-  (setq neo-default-system-application "open"))
+  (setq neo-default-system-application "open")
+  :config
+  (map! :n "gr" #'neotree-refresh))
 
 
 (use-package! xpp-mode
   :mode ("\\.ode\\'" . xpp-mode))
+
+
+(use-package! reveal-in-osx-finder
+  :config
+  (map! :leader :prefix "f"
+        "o" #'reveal-in-osx-finder))
+
+(use-package! terminal-here
+  :init
+  (setq terminal-here-mac-terminal-command 'iterm2))
 
 ;; (use-package! direnv
 ;;  :config
