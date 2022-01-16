@@ -768,8 +768,10 @@ opening REPL buffer."
   :init
   (setq super-save-auto-save-when-idle nil
         super-save-idle-duration 180)
-  (super-save-mode 1))
-
+  (super-save-mode 1)
+  :config
+  ;; NOTE Disable for docker since it bugs out here, no clue why.
+  (add-hook! 'dockerfile-mode-hook #'(lambda () (super-save-mode -1))))
 
 ;; NOTE: Quickfix to disable flycheck for now.
 ;; TODO: Need better solution in future, i.e. toggle flycheck etc.  Atm can't
@@ -867,15 +869,28 @@ opening REPL buffer."
 
 (use-package! reveal-in-osx-finder
   :config
-  (map! :leader :prefix "f"
-        "o" #'reveal-in-osx-finder))
+  (map! :leader :prefix "o"
+        "." #'reveal-in-osx-finder))
 
 (use-package! terminal-here
   :init
-  (setq terminal-here-mac-terminal-command 'iterm2))
+  (setq terminal-here-mac-terminal-command 'iterm2)
+  :config
+  (map! :leader :prefix "o"
+        "t" #'terminal-here
+        "T" #'terminal-here-project-launch))
 
 ;; (use-package! direnv
 ;;  :config
 ;;  (direnv-mode))
 
-;;
+(when (featurep! :lang python +conda)
+  (use-package! conda
+    :init
+    ;; TODO This stuff could be read from `conda config --show'
+    (setq conda-anaconda-home "/usr/local/Caskroom/mambaforge/base"
+          conda-env-home-directory "/Users/mark/.conda/")))
+(when (featurep! :lang python +pyright)
+  (use-package! lsp-pyright
+    :config
+    (conda-env-autoactivate-mode t)))
