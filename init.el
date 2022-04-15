@@ -13,7 +13,7 @@
        ;; Problem with +tng: Manual insertion of 4 spaces with TAB doesn't work.
        (company +tng); the ultimate code completion backend
        ;; (ivy +prescient +icons)
-       (helm +fuzzy + icons)
+       (helm +fuzzy +icons)
 
        :ui
        deft              ; notational velocity for Emacs
@@ -32,8 +32,8 @@
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
        ;;ligatures       ; ligatures or substitute text with pretty symbols
        ;; tabs              ; a tab bar for Emacs
-       neotree           ; a project drawer, like NERDTree for vim
-       ;; treemacs          ; a project drawer, like neotree but cooler
+       ;; neotree           ; a project drawer, like NERDTree for vim
+       treemacs          ; a project drawer, like neotree but cooler
        ;; unicode           ; extended unicode support for various languages
        vc-gutter         ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
@@ -103,7 +103,7 @@
        :lang
        ;;agda              ; types of types of types of types...
        ;;cc                ; C/C++/Obj-C madness
-       ;;clojure           ; java with a lisp
+       clojure           ; java with a lisp
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
@@ -133,7 +133,7 @@
               ;; fold fontifies stuff in place, but requires
               ;; +fold
               ;; lsp too slow
-              ;; +lsp
+              +lsp
               )
        ;;lean
        ;;factor
@@ -146,7 +146,7 @@
        ;; organize your plain life in plain text;
        (org +gnuplot
             +dragndrop
-            +roam2
+            ;; +roam2
             +pandoc
             +capture
             +pretty
@@ -156,6 +156,8 @@
        ;;purescript        ; javascript, but functional
        (python +lsp
                +conda
+               ;; +pyenv
+               +poetry
                +pyright)
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs

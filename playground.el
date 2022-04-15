@@ -103,84 +103,84 @@ ADD SOME EXPLANATION HERE...
   )
 
 
-  ;; python-shell stuff
-  (defun mark/python-send-var-at-point ()
-    "Send variable under cursor."
-    (interactive)
-    (python-shell-send-string (thing-at-point 'symbol)))
+;; python-shell stuff
+(defun mark/python-send-var-at-point ()
+  "Send variable under cursor."
+  (interactive)
+  (python-shell-send-string (thing-at-point 'symbol)))
 
-  (defun mark/python-send-line ()
-    (interactive)
-    (python-shell-send-string
-     (buffer-substring (line-beginning-position) (line-end-position))))
+(defun mark/python-send-line ()
+  (interactive)
+  (python-shell-send-string
+   (buffer-substring (line-beginning-position) (line-end-position))))
 
-  (defun mark/python-send-var-or-region ()
-    (interactive)
-    (if (not (use-region-p))
-        (mark/python-send-var-at-point)
-      (let ((beg (region-beginning))
-            (end (region-end)))
-        (if (> (evil-count-lines beg end) 1)
-            (python-shell-send-region)
-          (python-shell-send-string (buffer-substring beg end)))))
-    (evil-force-normal-state))
+(defun mark/python-send-var-or-region ()
+  (interactive)
+  (if (not (use-region-p))
+      (mark/python-send-var-at-point)
+    (let ((beg (region-beginning))
+          (end (region-end)))
+      (if (> (evil-count-lines beg end) 1)
+          (python-shell-send-region)
+        (python-shell-send-string (buffer-substring beg end)))))
+  (evil-force-normal-state))
 
 
-  (defun mark/python-get-var-call (var fun)
-    "Return string where VAR is called with FUN."
-    (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
+(defun mark/python-get-var-call (var fun)
+  "Return string where VAR is called with FUN."
+  (format "print(\"%s(%s): \" + str(%s(%s)))" fun var fun var))
 
-  (defun mark/python-call-point-with (fun)
-    "Call ting-at-point with FUN."
-    (let ((var (thing-at-point 'symbol)))
-      (python-shell-send-string (mark/python-get-var-call var fun))))
+(defun mark/python-call-point-with (fun)
+  "Call ting-at-point with FUN."
+  (let ((var (thing-at-point 'symbol)))
+    (python-shell-send-string (mark/python-get-var-call var fun))))
 
-  (defun mark/python-call-region-with (fun)
-    "Call single line region with FUN."
-    (let ((var (buffer-substring (mark) (point))))
-      (python-shell-send-string (mark/python-get-var-call var fun))))
+(defun mark/python-call-region-with (fun)
+  "Call single line region with FUN."
+  (let ((var (buffer-substring (mark) (point))))
+    (python-shell-send-string (mark/python-get-var-call var fun))))
 
-  (defun mark/python-call-point-or-region-with (fun)
-    "Call selected variable or variable under point with FUN."
-    (if (use-region-p)
-        (mark/python-call-region-with fun)
-      (mark/python-call-point-with fun)))
+(defun mark/python-call-point-or-region-with (fun)
+  "Call selected variable or variable under point with FUN."
+  (if (use-region-p)
+      (mark/python-call-region-with fun)
+    (mark/python-call-point-with fun)))
 
-  (defun mark/python-send-len ()
-    "Send length of var or region under point."
-    (interactive)
-    (mark/python-call-point-or-region-with "len"))
+(defun mark/python-send-len ()
+  "Send length of var or region under point."
+  (interactive)
+  (mark/python-call-point-or-region-with "len"))
 
-  (defun mark/python-send-max ()
-    "Send length of var under or region point."
-    (interactive)
-    (mark/python-call-point-or-region-with "max"))
+(defun mark/python-send-max ()
+  "Send length of var under or region point."
+  (interactive)
+  (mark/python-call-point-or-region-with "max"))
 
-  (defun mark/python-send-min ()
-    "Send length of var under or region point."
-    (interactive)
-    (mark/python-call-point-or-region-with "min"))
+(defun mark/python-send-min ()
+  "Send length of var under or region point."
+  (interactive)
+  (mark/python-call-point-or-region-with "min"))
 
-  (defun mark/python-send-shape ()
-    "Send share of var under point or region. Works only in pylab atm."
-    (interactive)
-    (mark/python-call-point-or-region-with "shape"))
+(defun mark/python-send-shape ()
+  "Send share of var under point or region. Works only in pylab atm."
+  (interactive)
+  (mark/python-call-point-or-region-with "shape"))
 
-  (defun mark/python-send-type ()
-    "Send type of var under point or region."
-    (interactive)
-    (mark/python-call-point-or-region-with "type"))
-  :config
-  (map!
-   (:map python-mode-map
-    :localleader
-    :n "\\" #'run-python
-    :n "v" #'mark/python-send-var-or-region
-    :n "m" #'mark/python-send-min
-    :n "M" #'mark/python-send-max
-    :n "s" #'mark/python-send-shape
-    :n "y" #'mark/python-send-type
-    :n "l" #'mark/python-send-len)))
+(defun mark/python-send-type ()
+  "Send type of var under point or region."
+  (interactive)
+  (mark/python-call-point-or-region-with "type"))
+:config
+(map!
+ (:map python-mode-map
+  :localleader
+  :n "\\" #'run-python
+  :n "v" #'mark/python-send-var-or-region
+  :n "m" #'mark/python-send-min
+  :n "M" #'mark/python-send-max
+  :n "s" #'mark/python-send-shape
+  :n "y" #'mark/python-send-type
+  :n "l" #'mark/python-send-len)))
 
 
 
@@ -199,3 +199,61 @@ ADD SOME EXPLANATION HERE...
       (add-hook! 'eglot--managed-mode-hook :append
         (defun mark/turn-off-flycheck ()
           (flycheck-mode -1))))))
+
+
+;; Try to convert org notes with links to logseq notes
+(setq roam-dir "~/org/roam/")
+(setq pages-dir "~/org/roam/pages/")
+
+;; (defun is-in-pages (note-name)
+;;   )
+
+;; Check if file exists
+(-contains? (directory-files "~/org/roam/pages/") "contents.org")
+
+;; Copy file
+(copy-file (concat roam-dir "20220110171728-coefficient_of_variation.org")
+           (concat pages-dir "20220110171728-coefficient_of_variation.org"))
+
+;; Get title from id
+(org-roam-node-title (org-roam-node-from-id "687b99a0-1e7d-4950-84f7-1bc875ae392e"))
+
+;; Find all references
+
+(defun do-note ()
+  "Replace all id: links with the note title in current buffer."
+  (org-with-point-at 1
+    (while (re-search-forward org-link-bracket-re nil t)
+      (let* ((mdata (match-data))
+             (path (match-string 1))
+             (desc (match-string 2)))
+        (when (string-prefix-p "id:" id)
+          ;; Get the actual id following the 'id:' string
+          (setq path (expand-file-name (substring path 3)))
+          (when-let ((node-title (caar (org-roam-db-query [:select [id] :from nodes
+                                                        :where (= file $s1)
+                                                        :and (= level 0)] path))))
+            (set-match-data mdata)
+            (replace-match (org-link-make-string (concat "id:" node-title)
+                                                 desc) nil t)))))))
+
+(org-roam-db-query [:select [title] :from nodes :where (= file $s1) :and (= level 0)]
+                   "~/org/roam/pages/20220128123936-statistical_power.org")
+
+(expand-file-name (substring "~/org/roam/pages/20220128123936-statistical_power.org" 5))
+
+
+(substring "file:20201119130535-memory_management.org" 5)
+(substring "id:122b8462-e39d-4e10-8254-264b188330af" 3)
+
+
+(defun copy-rename-note (note)
+  (let* ((id get)
+         (title (get-title-from-id ))))
+  )
+
+
+(defun get-title-from-id (id)
+  (org-roam-db-query
+   [:select [title] :from nodes
+    :where (= id $s1)] id))

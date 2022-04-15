@@ -13,10 +13,16 @@
 ;; Set doom looks
 ;; (setq doom-theme 'doom-monokai-machine)
 ;; (setq doom-theme 'doom-xcode)
+(setq doom-theme 'doom-material-dark)
+;; (setq doom-theme 'eclipse)
+;; (setq doom-theme 'doom-dracula)
 ;; (setq doom-theme 'xcode-dark)
-(setq doom-theme 'doom-monokai-machine)
+;; (setq doom-theme 'doom-vibrant)
+;; (setq doom-theme 'doom-monokai-machine)
 ;; (setq doom-theme 'doom-one)
-(setq doom-font (font-spec :family "SF Mono" :size 12
+;; (setq doom-font (font-spec :family "SF Mono" :size 12
+;;                            :weight 'normal))
+(setq doom-font (font-spec :family "Monaco" :size 12
                            :weight 'normal))
 ;; TODO Gets ignored when doom font reloaded
 ;;(set-face-background 'hl-line "#2F3239")
@@ -26,19 +32,18 @@
 ;; ----------------------------------------------------------
 ;; Mac stuffs
 ;;
-(setq mac-right-option-modifier 'hyper)
 (map! :g "s-`" #'other-frame
       :g "s-~" (lambda () (interactive) (other-frame -1)))
-;; This is a hack to enable proper cmd-TAB switching in mac,
+;; This is a hack to enable proper c-TAB switching in mac,
 ;; the menubar doesn't actually appear this way.
 (menu-bar-mode -1)
-(map! :gnv "<C-tab>" #'mac-next-tab-or-toggle-tab-bar)
+;; (map! :gnv "<C-tab>" #'mac-next-tab-or-toggle-tab-bar)
 (defun mark/make-new-frame ()
   (interactive)
   (make-frame-command)
   (mac-move-tab-to-new-frame))
 
-(map! :v "s-x" #'helm-M-x)
+
 
 ;; ----------------------------------------------------------
 
@@ -49,6 +54,7 @@
       confirm-kill-emacs nil
       windmove-wrap-around t)
 
+(map! :m "\\" nil)
 (setq doom-localleader-key "\\")
 
 ;; Disable evil-snipe for now
@@ -60,7 +66,8 @@
 
 ;; Make help window bigger
 (set-popup-rules!
-  '(("^\\*[Hh]elp" :size 20 :select t)))
+  '(("^\\*[Hh]elp" :size 20 :select t)
+    ("^\\*jupyter-error" :ttl 0)))
 
 ;; Setup some readline keys etc
 (map! :ie "C-h" #'backward-delete-char-untabify
@@ -79,24 +86,26 @@
       :g "s-t" #'make-frame-command
       ;; Delete frame and don't ask to confirm
       :g "s-w" (lambda () (interactive) (delete-frame nil t))
-      :g "H-h" #'windmove-left
-      :g "H-j" #'windmove-down
-      :g "H-k" #'windmove-up
-      :g "H-l" #'windmove-right
-      :g "s-[" #'evil-window-prev
-      :g "s-]" #'evil-window-next
-      :g "<H-left>" #'windmove-left
-      :g "<H-down>" #'windmove-down
-      :g "<H-up>" #'windmove-up
-      :g "<H-right>" #'windmove-right
-      :g "H-m" #'doom/window-maximize-vertically
-      :g "H-0" #'delete-window
+      :g "<C-left>" #'windmove-left
+      :g "<C-down>" #'windmove-down
+      :g "<C-up>" #'windmove-up
+      :g "<C-right>" #'windmove-right
+      :g "C-0" #'delete-window
       :g "s-p" #'counsel-find-file
       ;; :g "<C-tab>" #'mac-next-tab-or-toggle-tab-bar
       ;; :g "<C-S-tab>" #'mac-previous-tab-or-toggle-tab-bar
       ;; :g "s-t" #'mac-PDF-to-string
-      :g "H-d" #'+evil-window-vsplit-a
-      :g "H-s" #'+evil-window-split-a)
+      :g "s-d" #'+evil-window-vsplit-a
+      :g "s-D" #'+evil-window-split-a
+      :n "C-h" #'windmove-left
+      :n "C-j" #'windmove-down
+      :n "C-k" #'windmove-up
+      :n "C-l" #'windmove-right
+      )
+
+(map! :leader :prefix "w"
+      :n "1" #'doom/window-maximize-vertically
+      :n "0" #'evil-window-delete)
 
 
 (map! :leader
@@ -179,13 +188,17 @@
 ;;          "C-h" #'backward-delete-char-untabify)))
 
 (when (featurep! :completion helm)
+  (use-package! projectile
+    :init
+    (setq projectile-enable-caching nil))
   (use-package! helm
     :init
     (setq helm-move-to-line-cycle-in-source nil)
     :config
+    (map! :leader
+          :n "," #'helm-buffers-list )
     (map! :g "M-y" #'helm-show-kill-ring
-          ;; :g "<f13>" #'+ivy/switch-workspace-buffer))
-          ;; f14 should be RALT
+          :v "s-x" #'helm-M-x
           :g "<f18>" #'projectile-switch-to-buffer
           (:map helm-map
            "C-h" #'backward-delete-char-untabify)
@@ -197,17 +210,22 @@
 ;; Sane company defaults
 (use-package! company
   :init
-  (setq company-selection-wrap-around t)
+  (setq company-selection-wrap-around t
+        company-show-quick-access t)
   :config
   ;; TODO wtf is this?
   (set-company-backend! '(text-mode prog-mode)
     'company-files)
+  (use-package! company-tabnine
+    :config
+    (add-to-list 'company-backends #'company-tabnine))
   (map!
    :i "C-l" #'+company/complete
    (:map company-active-map
     :g "C-l" #'company-complete-common
     :g "C-h" #'backward-delete-char-untabify
     :g "C-S-h" #'company-show-doc-buffer)))
+
 
 
 (use-package! text-mode
@@ -227,8 +245,7 @@
 
 
 (use-package! org
-  :hook ((org-mode . org-fragtog-mode)
-         (org-mode . org-autolist-mode)
+  :hook ((org-mode . org-autolist-mode)
          (org-mode . +org-pretty-mode))
   :init
   (setq org-log-done 'time
@@ -240,8 +257,10 @@
         ;; IDs. If no such file is found, Emacs will go through all files
         ;; and try to generate it, which might take time.
         ;; org-id-track-globally t
-        org-hide-emphasis-markers t
-        org-startup-with-latex-preview t
+        ;; org-hide-emphasis-markers t
+        ;; org-startup-with-latex-preview t
+        org-hide-emphasis-markers nil
+        org-startup-with-latex-preview nil
         ;; The perfect indentation setup
         org-indent-indentation-per-level 0
         ;; Add mathtools to latex packages.
@@ -263,8 +282,10 @@
         '(("+" . "*") ("-" . "+") ("*" . "+") ("1." . "a."))
         org-src-window-setup 'current-window
         org-indent-indentation-per-level 0
-        org-startup-indented 't
-        org-startup-folded 't
+        ;; org-startup-indented 't
+        ;; org-startup-folded 't
+        org-startup-indented nil
+        org-startup-folded nil
         )
   ;; NOTE: Not sure if that's correct.
   ;; TODO: Double check
@@ -305,183 +326,41 @@
         org-download-heading-lvl nil))
 
 
-(use-package! org-roam
-  :init
-  ;; `org-roam-directory' is set to "~/org/roam" by doom by default
-  (setq org-roam-db-gc-threshold most-positive-fixnum
-        +org-roam-open-buffer-on-find-file nil)
-  ;; Set up templates
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?"
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                              "#+TITLE: ${title}\n\n")
-           :unnarrowed t)
-          ("i" "immediate" plain "%?"
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                              "#+TITLE: ${title}\n\n")
-           :unnarrowed t
-           :immediate-finish t)
-          ("f" "fleeting" plain "%?"
-           :if-new (file+head "fleeting/%<%Y%m%d%H%M%S>-${slug}.org"
-                              "#+TITLE: ${title}\n\n")
-           :unnarrowed t)
-          ("F" "flaschenpost" plain "%?"
-           :if-new (file+head "flaschenpost/%<%Y%m%d%H%M%S>-${slug}.org"
-                              "#+TITLE: ${title}\n\n")
-           :unnarrowed t)
-          ))
-
-  :config
-  (setq org-roam-completion-everywhere nil)
-  ;; No need for timestamp after all
-  ;; Timestamp
-  ;; (setq time-stamp-active t
-  ;;       time-stamp-start "#\\+last_modified:[ \t]*"
-  ;;       time-stamp-end "$"
-  ;;       time-stamp-format "\[%Y-%02m-%02d %3a %02H:%02M\]")
-  ;; (add-hook 'before-save-hook 'time-stamp nil)
-  (map!
-   :g "<f19>" #'org-roam-node-find
-   :g "<C-f19>" #'org-roam-node-insert
-   (:map org-mode-map
-    :localleader
-    :prefix ("m" . "org-roam")
-    "a" #'org-roam-alias-add
-    "A" #'org-roam-alias-delete
-    "t" #'org-roam-tag-add
-    "T" #'org-roam-tag-remove
-    "R" #'org-roam-db-build-cache))
-
-  (defun org-hide-properties ()
-    "Hide all org-mode headline property drawers in buffer. Could be slow if it has a lot of overlays."
-    (interactive)
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward
-              "^ *:properties:\n\\( *:.+?:.*\n\\)+ *:end:\n" nil t)
-        (let ((ov_this (make-overlay (match-beginning 0) (match-end 0))))
-          (overlay-put ov_this 'display "")
-          (overlay-put ov_this 'hidden-prop-drawer t))))
-    (put 'org-toggle-properties-hide-state 'state 'hidden))
-
-  (defun org-show-properties ()
-    "Show all org-mode property drawers hidden by org-hide-properties."
-    (interactive)
-    (remove-overlays (point-min) (point-max) 'hidden-prop-drawer t)
-    (put 'org-toggle-properties-hide-state 'state 'shown))
-
-  (defun org-toggle-properties ()
-    "Toggle visibility of property drawers."
-    (interactive)
-    (if (eq (get 'org-toggle-properties-hide-state 'state) 'hidden)
-        (org-show-properties)
-      (org-hide-properties)))
-
-  ;; Redefine this org-roam function to hide properties.
-  ;; I'm sure there's a better solution
-  (defun org-roam-buffer-persistent-redisplay ()
-    "Recompute contents of the persistent `org-roam-buffer'.
-Has no effect when there's no `org-roam-node-at-point'."
-    (when-let ((node (org-roam-node-at-point)))
-      (unless (equal node org-roam-buffer-current-node)
-        (setq org-roam-buffer-current-node node
-              org-roam-buffer-current-directory org-roam-directory)
-        (with-current-buffer (get-buffer-create org-roam-buffer)
-          (org-roam-buffer-render-contents)
-          ;; Hide properties
-          (org-hide-properties)
-          ;; Show only titles of backlinks
-          (magit-section-show-level-2)
-          (add-hook 'kill-buffer-hook #'org-roam-buffer--persistent-cleanup-h nil t)))))
-  )
-
-;; (use-package! org-roam-timestamps
-;;   :after org-roam
-;;   :config (org-roam-timestamps-mode))
-
-;; ;; NOTE: Just testing
-;; (use-package! nroam
-;;   :after org-roam
-;;   :config
-;;   (add-hook 'org-mode-hook #'nroam-setup-maybe))
-
-
-;; BUG: Seems to slow down everything, in particular problematic
-;; with dailies.  Not using for now.
-;; ;; Pretty note graphs
-;; (use-package! org-roam-server
-;;   ;; Load this pacakge after org-roam is called.
-;;   :after-call org-roam
-;;   :config
-;;   ;; This is to fix a bug with Doom:
-;;   ;; https://github.com/org-roam/org-roam-server/issues/115
-;;   (defun org-roam-server-open ()
-;;     "Ensure the server is active, then open the roam graph."
-;;     (interactive)
-;;     (smartparens-global-mode -1)
-;;     (org-roam-server-mode 1)
-;;     (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))
-;;     (smartparens-global-mode 1))
-;;   (map!
-;;    (:leader :prefix ("r" . "roam")
-;;     :desc "Start server for web graph" "G" #'org-roam-server-open)))
-
-(use-package! org-roam-bibtex
-  :after org-roam
-  :hook (org-roam-mode . org-roam-bibtex-mode)
-  :init
-  (setq orb-templates
-        '(("b" "bib-note" plain #'org-roam-capture--get-point
-           "%?"
-           :file-name "bib/${citekey}"
-           :head "#+TITLE: ${title}\n#+ROAM_ALIAS: \"${=key=}\"\n#+ROAM_KEY: ${ref}\n\n"
-           :unnarrowed t))))
-
-
-(use-package! org-ref
-  :after (org org-roam)
-  :init
-  (setq org-ref-notes-directory (concat org-roam-directory "bib/")
-        ;; Why nil here?
-        org-ref-show-broken-links nil
-        org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
-        ;; Use `org-roam-bibtex' to edit files
-        ;; TODO Make this conditional
-        org-ref-notes-function 'orb-edit-notes))
-
-
-(use-package! latex
-  :init
-  (setq
-   TeX-save-query nil             ; Don't ask to save before compile.
-   TeX-engine 'luatex
-   TeX-electric-sub-and-superscript nil)
-  ;; Don't preview figures
-  (setq preview-default-option-list
-        '("displaymath" "textmath" "sections" "footnotes" "showlabels"))
-  ;; Sane paragraph definition
-  (setq-hook! 'LaTeX-mode-hook
-    paragraph-start "\f\\|[ 	]*$"
-    paragraph-separate "[ 	\f]*$")
-  (add-hook! 'TeX-mode-hook #'hl-todo-mode)
-  (add-hook! 'TeX-mode-hook #'TeX-fold-mode)
-  ;; NOTE tex-fold is to show \textbf as bold etc
-  ;; https://emacs.stackexchange.com/questions/14113/how-to-render-latex-expressions-not-necessarily-formula-inside-buffer
-  ;; TODO Try the same with quotes (``'')!
-  ;; TODO Need to do this in a hook or sth
-  ;; :config
-  ;; (add-to-list 'TeX-fold-macro-spec-list
-  ;;              '("[c]" ("cite" "citep")))
-  :config
-  ;; Use Skim but don't use Skim's reading bar
-  ;; (setq TeX-view-program-list
-  ;;       '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %o %b")))
-  )
+(when (featurep! :lang latex)
+  (use-package! latex
+    :init
+    (setq
+     TeX-save-query nil             ; Don't ask to save before compile.
+     TeX-engine 'luatex
+     TeX-electric-sub-and-superscript t
+     LaTeX-indent-level 0
+     LaTeX-item-indent 0)
+    ;; Don't preview figures
+    (setq preview-default-option-list
+          '("displaymath" "textmath" "sections" "footnotes" "showlabels"))
+    ;; Sane paragraph definition
+    (setq-hook! 'LaTeX-mode-hook
+      paragraph-start "\f\\|[ 	]*$"
+      paragraph-separate "[ 	\f]*$")
+    (add-hook! 'TeX-mode-hook #'hl-todo-mode)
+    (add-hook! 'TeX-mode-hook #'TeX-fold-mode)
+    ;; NOTE tex-fold is to show \textbf as bold etc
+    ;; https://emacs.stackexchange.com/questions/14113/how-to-render-latex-expressions-not-necessarily-formula-inside-buffer
+    ;; TODO Try the same with quotes (``'')!
+    ;; TODO Need to do this in a hook or sth
+    ;; :config
+    ;; (add-to-list 'TeX-fold-macro-spec-list
+    ;;              '("[c]" ("cite" "citep")))
+    :config
+    ;; Use Skim but don't use Skim's reading bar
+    (setq TeX-view-program-list
+          '(("Skim"
+             "/Applications/Skim.app/Contents/SharedSupport/displayline %n %o %b")))))
 
 
 (use-package! cdlatex
   :init
-  (setq cdlatex-simplify-sub-super-scripts t
+  (setq cdlatex-simplify-sub-super-scripts nil
         cdlatex-sub-super-scripts-outside-math-mode t)
   (setq cdlatex-env-alist
         '(
@@ -629,7 +508,8 @@ opening REPL buffer."
       (interactive)
       ;; FIXME ???
       (let* ((kernel-dir
-              (nth 0 (split-string (shell-command-to-string "jupyter --runtime-dir")))))
+              (nth 0 (split-string (shell-command-to-string
+                                    "jupyter --runtime-dir")))))
         (jupyter-connect-repl
          (nth 0 (mapcar #'car
                         (sort
@@ -856,13 +736,6 @@ opening REPL buffer."
   (yasnippet-radical-snippets-initialize))
 
 
-(use-package! neotree
-  :init
-  (setq neo-default-system-application "open")
-  :config
-  (map! :n "gr" #'neotree-refresh))
-
-
 (use-package! xpp-mode
   :mode ("\\.ode\\'" . xpp-mode))
 
@@ -889,8 +762,45 @@ opening REPL buffer."
     :init
     ;; TODO This stuff could be read from `conda config --show'
     (setq conda-anaconda-home "/usr/local/Caskroom/mambaforge/base"
-          conda-env-home-directory "/Users/mark/.conda/")))
-(when (featurep! :lang python +pyright)
-  (use-package! lsp-pyright
+          conda-env-home-directory "/Users/mark/.conda/")
     :config
-    (conda-env-autoactivate-mode t)))
+    ;; Don't autoactivate for now
+    (conda-env-autoactivate-mode -1)))
+;; (add-hook! 'find-file-hook #'(lambda ()
+;;                                (when (bound-and-true-p conda-project-env-path)
+;;                                  (conda-env-activate-for-buffer))))))
+
+
+(when (featurep! :lang python +poetry)
+  (use-package! poetry
+    :init
+    (remove-hook! python-mode #'poetry-tracking-mode)
+    :config
+    (map!
+     (:map python-mode-map :localleader
+      :n "\p" #'poetry))))
+
+
+(when (featurep! :ui treemacs)
+  (use-package! treemacs
+    :init
+    (setq treemacs-width 30)
+    :config
+    (add-hook! 'treemacs-mode-hook #'treemacs-follow-mode)
+    (map! :map treemacs-mode-map
+          ;; Use single clicks to interact with UI
+          [mouse-1] #'treemacs-single-click-expand-action
+          ;; Need this since normal mode doesn't work here
+          "C-h" #'windmove-left
+          "C-j" #'windmove-down
+          "C-k" #'windmove-up
+          "C-l" #'windmove-right)
+    (map! :g "s-[" #'treemacs-select-window
+          :g "s-]" #'+treemacs/toggle)))
+
+
+;; (use-package! neotree
+;;   :init
+;;   (setq neo-default-system-application "open")
+;;   :config
+;;   (map! :n "gr" #'neotree-refresh))

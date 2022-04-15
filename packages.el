@@ -10,6 +10,7 @@
 (package! leuven-theme)
 (package! github-theme)
 
+
 ;; (unpin! bibtex-completion helm-bibtex org-roam)
 ;; NOTE: There's some bug with org-roam, pinning for now.
 ;; Error (org-roam): Failed to parse aliases for buffer:
@@ -76,3 +77,9 @@
 (package! terminal-here)
 
 (package! zmq)
+
+(package! company-tabnine)
+
+
+;; Revert all buffers with some extra goodies
+(package! revert-buffer-all)
