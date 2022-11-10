@@ -11,7 +11,8 @@
 (doom! :input
        :completion
        ;; Problem with +tng: Manual insertion of 4 spaces with TAB doesn't work.
-       (company +tng); the ultimate code completion backend
+       ;; (company +tng); the ultimate code completion backend
+       company; the ultimate code completion backend
        ;; (ivy +prescient +icons)
        (helm +fuzzy +icons)
 
@@ -21,7 +22,6 @@
        ;; doom-dashboard    ; a nifty splash screen for Emacs
        ;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
        ;;(emoji +unicode)  ; 🙂
-       fill-column       ; a `fill-column' indicator
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        hydra
        ;; indent-guides     ; highlighted indent columns
